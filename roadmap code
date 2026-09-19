@@ -1,0 +1,1624 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Career Learning Dashboard</title>
+  <style>
+    :root {
+      --bg:#070b14;
+      --bg-alt:#0d1323;
+      --surface:#111a2e;
+      --surface-2:#16233d;
+      --surface-3:#1a2c4d;
+      --border:#2a3e67;
+      --text:#ecf2ff;
+      --muted:#9db0d9;
+      --accent:#5e8cff;
+      --accent-2:#34c0ff;
+      --good:#3fd18f;
+      --warn:#f7bc46;
+      --danger:#f66a74;
+      --shadow:0 14px 36px rgba(0,0,0,.35);
+      --radius:16px;
+      --radius-sm:12px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,Segoe UI,Roboto,system-ui,-apple-system,sans-serif;
+      color:var(--text);
+      background:radial-gradient(1200px 700px at 100% -10%,rgba(86,123,255,.2),transparent),radial-gradient(700px 700px at -10% 100%,rgba(65,179,255,.16),transparent),var(--bg);
+    }
+
+    a{color:#a9d4ff;text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .app{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:280px 1fr;
+    }
+
+    .sidebar{
+      border-right:1px solid var(--border);
+      background:linear-gradient(180deg,rgba(17,26,46,.96),rgba(10,16,31,.96));
+      backdrop-filter:blur(8px);
+      padding:1.1rem;
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:auto;
+    }
+
+    .brand{display:flex;align-items:center;gap:.7rem;margin-bottom:1.1rem}
+    .brand .logo{
+      width:38px;height:38px;border-radius:12px;
+      background:linear-gradient(145deg,var(--accent),var(--accent-2));
+      display:grid;place-items:center;font-weight:700;color:white;
+      box-shadow:0 10px 20px rgba(69,139,255,.3)
+    }
+    .brand h1{margin:0;font-size:1rem;line-height:1.15}
+    .brand small{display:block;color:var(--muted);font-size:.74rem}
+
+    .demo-tag{padding:.5rem .65rem;border:1px dashed var(--border);border-radius:12px;background:rgba(34,52,88,.35);font-size:.78rem;color:var(--muted);margin-bottom:.9rem}
+
+    .nav-list{display:grid;gap:.34rem}
+    .nav-btn{
+      border:1px solid transparent;
+      background:transparent;
+      color:var(--text);
+      text-align:left;
+      border-radius:12px;
+      padding:.62rem .72rem;
+      display:flex;align-items:center;gap:.55rem;
+      cursor:pointer;
+      transition:.22s ease;
+    }
+    .nav-btn:hover{background:rgba(73,115,213,.15);border-color:rgba(115,157,255,.2)}
+    .nav-btn.active{background:linear-gradient(90deg,rgba(80,126,255,.28),rgba(80,194,255,.2));border-color:rgba(140,179,255,.42)}
+    .nav-icon{width:20px;text-align:center;opacity:.95}
+
+    .main{display:flex;flex-direction:column;min-width:0}
+
+    .topbar{
+      position:sticky;top:0;z-index:50;
+      background:rgba(8,13,24,.76);
+      backdrop-filter:blur(9px);
+      border-bottom:1px solid var(--border);
+      padding:.85rem 1.15rem;
+      display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;
+    }
+
+    .topbar-left{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+    .topbar h2{margin:0;font-size:1.1rem}
+    .kbtn,.btn{
+      border:1px solid var(--border);
+      background:var(--surface-2);
+      color:var(--text);
+      border-radius:11px;
+      padding:.5rem .72rem;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .kbtn:hover,.btn:hover{transform:translateY(-1px);border-color:#6a91df}
+    .btn.primary{background:linear-gradient(130deg,var(--accent),#4ca9ff);border-color:transparent;color:#fff}
+    .btn.ghost{background:transparent}
+    .btn.warn{background:rgba(247,188,70,.12);border-color:rgba(247,188,70,.35);color:#ffd894}
+
+    .top-profile{display:flex;align-items:center;gap:.6rem;padding:.35rem .55rem;border:1px solid var(--border);border-radius:999px;background:rgba(36,53,86,.5)}
+    .avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(130deg,#5e8cff,#4ed2ff);display:grid;place-items:center;font-size:.8rem;font-weight:700;color:white}
+
+    .content{padding:1rem 1.15rem 5rem;display:grid;gap:1rem}
+
+    .surface{background:linear-gradient(180deg,rgba(20,30,52,.9),rgba(14,22,39,.9));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
+    .surface.flat{box-shadow:none}
+    .surface h3,.surface h4{margin:.2rem 0 .5rem}
+    .muted{color:var(--muted)}
+    .tiny{font-size:.8rem}
+
+    .grid{display:grid;gap:.85rem}
+    .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+    .metric{font-size:1.65rem;font-weight:700;line-height:1}
+    .metric-sub{font-size:.82rem;color:var(--muted)}
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.4fr 1fr;
+      gap:.9rem;
+      align-items:stretch;
+    }
+
+    .ring-wrap{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+    .ring{width:170px;height:170px;position:relative}
+    .ring svg{transform:rotate(-90deg)}
+    .ring .center{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+    .ring .center strong{font-size:1.55rem}
+
+    .pill{display:inline-flex;align-items:center;border:1px solid var(--border);padding:.17rem .5rem;border-radius:999px;font-size:.75rem;background:rgba(32,47,79,.64);gap:.35rem}
+    .st-good{color:var(--good)} .st-warn{color:var(--warn)} .st-bad{color:var(--danger)}
+
+    .progress-track{height:9px;border-radius:99px;background:#0d1730;border:1px solid var(--border);overflow:hidden}
+    .progress-track > span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .5s ease}
+
+    .subtle-list{display:grid;gap:.45rem}
+    .subtle-item{display:flex;justify-content:space-between;gap:.4rem;padding:.48rem .58rem;border-radius:10px;background:rgba(20,31,56,.52);border:1px solid rgba(76,104,161,.36)}
+
+    .section{display:none;animation:fade .25s ease}
+    .section.active{display:block}
+    @keyframes fade{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+    .timeline{position:relative;display:grid;gap:.6rem;padding-left:1rem}
+    .timeline:before{content:"";position:absolute;left:.42rem;top:.2rem;bottom:.2rem;width:2px;background:linear-gradient(var(--accent),rgba(94,140,255,.1))}
+    .node{position:relative;padding:.6rem .7rem .65rem .8rem;border:1px solid var(--border);border-radius:12px;background:rgba(26,41,71,.55);cursor:pointer;transition:.2s ease}
+    .node:before{content:"";position:absolute;left:-.94rem;top:1rem;width:.7rem;height:.7rem;border-radius:50%;border:2px solid #8ab3ff;background:#1a2f56}
+    .node:hover{transform:translateX(2px)}
+    .node.completed{border-color:rgba(66,203,145,.45)}
+    .node.completed:before{background:var(--good);border-color:rgba(66,203,145,.42)}
+    .node.inprogress{border-color:rgba(247,188,70,.5)}
+    .node.inprogress:before{background:var(--warn);border-color:rgba(247,188,70,.45)}
+    .node.locked{opacity:.58}
+
+    .label-row{display:flex;flex-wrap:wrap;gap:.35rem}
+
+    input,select,textarea{
+      width:100%;
+      background:#0f1933;
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:.52rem .62rem;
+      font:inherit;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    textarea{min-height:80px;resize:vertical}
+    input:focus,select:focus,textarea:focus,.btn:focus,.nav-btn:focus,.kbtn:focus{outline:none;border-color:#78a3ff;box-shadow:0 0 0 3px rgba(106,149,255,.18)}
+
+    .field{display:grid;gap:.25rem}
+    .field label{font-size:.82rem;color:var(--muted)}
+
+    .resource-card,.skill-card{border:1px solid var(--border);border-radius:13px;background:rgba(20,31,55,.56);padding:.75rem}
+    .resource-card:hover,.skill-card:hover{border-color:rgba(129,166,240,.52)}
+
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:.52rem .32rem;border-bottom:1px solid rgba(79,108,168,.35);text-align:left;vertical-align:top}
+    th{color:#bfd2f8;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+    td{font-size:.9rem}
+
+    .heatmap{display:grid;grid-template-rows:repeat(7,13px);grid-auto-flow:column;grid-auto-columns:13px;gap:4px;overflow:auto;padding:.3rem 0 .5rem}
+    .cell{border:1px solid rgba(62,87,137,.56);border-radius:3px;background:#0b162f}
+    .l1{background:#163864}.l2{background:#2360a1}.l3{background:#2d86d4}.l4{background:#45b8ff}
+
+    .chart{display:flex;align-items:flex-end;gap:8px;height:150px;padding:.45rem .4rem .2rem;border:1px solid var(--border);border-radius:12px;background:rgba(13,21,38,.7)}
+    .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem}
+    .bar .fill{width:100%;border-radius:8px 8px 3px 3px;min-height:2px;background:linear-gradient(180deg,#66b8ff,#557dff);transition:height .5s ease}
+    .bar small{color:var(--muted);font-size:.68rem}
+
+    .ach-list{display:grid;gap:.46rem}
+    .ach{display:flex;justify-content:space-between;gap:.5rem;padding:.5rem .58rem;border:1px solid rgba(90,118,177,.35);border-radius:10px;background:rgba(16,27,48,.65)}
+    .ach.done{border-color:rgba(64,200,140,.45);background:rgba(31,64,53,.28)}
+
+    .drawer, .palette{position:fixed;inset:0;background:rgba(4,8,16,.65);backdrop-filter:blur(4px);display:none;z-index:200}
+    .drawer.open,.palette.open{display:grid;place-items:center;animation:fade .2s ease}
+    .drawer-panel,.palette-panel{width:min(900px,92vw);max-height:86vh;overflow:auto;background:linear-gradient(180deg,#101a30,#0d162a);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:1rem}
+    .palette-panel{width:min(760px,92vw)}
+
+    .result-item{padding:.52rem .58rem;border-radius:10px;border:1px solid rgba(79,108,168,.35);background:rgba(20,31,56,.52);cursor:pointer}
+    .result-item:hover{border-color:#7da7ff}
+
+    .toast{position:fixed;right:1rem;bottom:1rem;z-index:250;background:#10203f;border:1px solid var(--border);padding:.6rem .8rem;border-radius:12px;display:none;max-width:340px;box-shadow:var(--shadow)}
+
+    .mobile-nav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:90;background:rgba(10,16,30,.94);border-top:1px solid var(--border);padding:.34rem .45rem}
+    .mobile-nav .row{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:.24rem}
+    .mnav{border:1px solid transparent;background:transparent;color:var(--muted);padding:.3rem .2rem;border-radius:10px;font-size:.69rem;display:grid;justify-items:center;gap:.18rem;cursor:pointer}
+    .mnav.active{color:var(--text);border-color:rgba(132,170,249,.35);background:rgba(80,126,255,.15)}
+
+    .celebrate{animation:pulse .8s ease}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(63,209,143,.45)}100%{box-shadow:0 0 0 18px rgba(63,209,143,0)}}
+
+    .hidden{display:none!important}
+
+    @media (max-width:1120px){
+      .hero{grid-template-columns:1fr}
+      .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .g3{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
+    @media (max-width:900px){
+      .app{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .mobile-nav{display:block}
+      .content{padding-bottom:5.7rem}
+    }
+
+    @media (max-width:700px){
+      .g4,.g3,.g2{grid-template-columns:1fr}
+      .ring{width:145px;height:145px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="Main navigation">
+      <div class="brand">
+        <div class="logo">DL</div>
+        <div>
+          <h1>Data Learning OS</h1>
+          <small>Career growth dashboard</small>
+        </div>
+      </div>
+      <div id="demoTag" class="demo-tag"></div>
+      <div id="desktopNav" class="nav-list"></div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h2 id="sectionTitle">Dashboard</h2>
+          <button id="searchBtn" class="kbtn" type="button">⌘/Ctrl + K Search</button>
+        </div>
+        <div class="top-profile">
+          <div class="avatar" id="topAvatar">U</div>
+          <div>
+            <div id="topName" class="tiny">Learner</div>
+            <div id="topPath" class="tiny muted">Primary Path</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section id="storageNotice" class="surface hidden"></section>
+        <section id="dashboardSection" class="section active"></section>
+        <section id="careerSection" class="section"></section>
+        <section id="roadmapSection" class="section"></section>
+        <section id="progressSection" class="section"></section>
+        <section id="resourcesSection" class="section"></section>
+        <section id="skillsSection" class="section"></section>
+        <section id="activitySection" class="section"></section>
+        <section id="goalsSection" class="section"></section>
+      </main>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <div id="mobileNav" class="row"></div>
+  </nav>
+
+  <div id="skillDrawer" class="drawer" aria-hidden="true">
+    <div class="drawer-panel">
+      <div style="display:flex;justify-content:space-between;gap:.6rem;align-items:center;flex-wrap:wrap">
+        <h3 id="drawerTitle" style="margin:.1rem 0">Skill detail</h3>
+        <button class="btn ghost" id="drawerClose" type="button">Close</button>
+      </div>
+      <div id="drawerBody"></div>
+    </div>
+  </div>
+
+  <div id="palette" class="palette" aria-hidden="true">
+    <div class="palette-panel">
+      <div class="field">
+        <label for="paletteInput">Search skills, resources, paths, notes, goals</label>
+        <input id="paletteInput" placeholder="Try: SQL, streak, Data Engineer..." />
+      </div>
+      <div id="paletteResults" class="grid" style="margin-top:.7rem"></div>
+      <div class="tiny muted" style="margin-top:.5rem">Enter to open first result • Esc to close</div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = 'dataCareerDashboardV1';
+    const STATUS_OPTIONS = ['Not Started', 'In Progress', 'Completed'];
+    const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
+    const PATHS = {
+      'Data Analyst': {desc:'Transforms data into business insights using SQL, BI, spreadsheets, and storytelling.', difficulty:'Moderate', tools:['SQL','Excel','Power BI','Tableau','A/B Testing']},
+      'Data Scientist': {desc:'Builds predictive models and experimentation workflows with stats and machine learning.', difficulty:'High', tools:['Python','Pandas','Scikit-learn','Statistics','Experimentation']},
+      'Data Engineer': {desc:'Builds pipelines, warehousing, and reliable data infrastructure for analytics/ML.', difficulty:'High', tools:['Python','SQL','Airflow','Kafka','Warehousing']},
+      'Analytics Engineer': {desc:'Designs trusted data models and semantic layers for reliable analytics.', difficulty:'Moderate', tools:['dbt','SQL','Modeling','Metrics Layer']},
+      'ML Engineer': {desc:'Deploys models in production and operates robust MLOps systems.', difficulty:'Very High', tools:['APIs','Docker','Monitoring','CI/CD','MLOps']}
+    };
+
+    const NAV_ITEMS = [
+      {id:'dashboard',label:'Dashboard',icon:'📊',section:'dashboardSection'},
+      {id:'career',label:'Career Paths',icon:'🧭',section:'careerSection'},
+      {id:'roadmap',label:'Roadmap',icon:'🗺️',section:'roadmapSection'},
+      {id:'progress',label:'Progress',icon:'📈',section:'progressSection'},
+      {id:'resources',label:'Resources',icon:'📚',section:'resourcesSection'},
+      {id:'skills',label:'Skills',icon:'🧠',section:'skillsSection'},
+      {id:'activity',label:'Activity',icon:'🔥',section:'activitySection'},
+      {id:'goals',label:'Goals & Notes',icon:'🎯',section:'goalsSection'}
+    ];
+
+    const PHASE_BY_LEVEL = {Beginner:'Foundation',Intermediate:'Core Skills',Advanced:'Advanced Skills'};
+
+    const seedSkills = [
+      { id:'sql-foundations', name:'SQL Foundations', path:'Data Analyst', level:'Beginner', estHours:25, deps:[], resources:[{title:'SQLBolt',url:'https://sqlbolt.com/'},{title:'Mode SQL Tutorial',url:'https://mode.com/sql-tutorial/'}], order:1 },
+      { id:'excel-analysis', name:'Excel & Spreadsheets', path:'Data Analyst', level:'Beginner', estHours:20, deps:[], resources:[{title:'ExcelIsFun',url:'https://www.youtube.com/user/ExcelIsFun'}], order:2 },
+      { id:'data-visualization', name:'Data Visualization (Tableau/Power BI)', path:'Data Analyst', level:'Intermediate', estHours:30, deps:['sql-foundations'], resources:[{title:'Microsoft Power BI Learning',url:'https://learn.microsoft.com/en-us/training/powerplatform/power-bi/'},{title:'Tableau Free Training',url:'https://www.tableau.com/learn/training'}], order:3 },
+      { id:'ab-testing', name:'A/B Testing & Experimentation', path:'Data Analyst', level:'Advanced', estHours:22, deps:['data-visualization'], resources:[{title:'Khan Academy Statistics',url:'https://www.khanacademy.org/math/statistics-probability'}], order:4 },
+      { id:'python-basics', name:'Python for Data Work', path:'Data Scientist', level:'Beginner', estHours:35, deps:[], resources:[{title:'Python Data Science Handbook',url:'https://jakevdp.github.io/PythonDataScienceHandbook/'},{title:'freeCodeCamp Python',url:'https://www.freecodecamp.org/learn/scientific-computing-with-python/'}], order:1 },
+      { id:'stats-prob', name:'Statistics & Probability', path:'Data Scientist', level:'Beginner', estHours:40, deps:[], resources:[{title:'OpenIntro Statistics',url:'https://www.openintro.org/book/os/'}], order:2 },
+      { id:'ml-fundamentals', name:'Machine Learning Fundamentals', path:'Data Scientist', level:'Intermediate', estHours:50, deps:['python-basics','stats-prob'], resources:[{title:'Hands-On ML Samples',url:'https://github.com/ageron/handson-ml3'},{title:'Google ML Crash Course',url:'https://developers.google.com/machine-learning/crash-course'}], order:3 },
+      { id:'model-evaluation', name:'Model Evaluation & Explainability', path:'Data Scientist', level:'Advanced', estHours:28, deps:['ml-fundamentals'], resources:[{title:'Interpretable ML',url:'https://christophm.github.io/interpretable-ml-book/'}], order:4 },
+      { id:'python-etl', name:'Python ETL Scripting', path:'Data Engineer', level:'Beginner', estHours:30, deps:[], resources:[{title:'Real Python ETL',url:'https://realpython.com/python-data-cleaning-numpy-pandas/'}], order:1 },
+      { id:'data-warehousing', name:'Data Warehousing Concepts', path:'Data Engineer', level:'Intermediate', estHours:35, deps:['python-etl'], resources:[{title:'Kimball Group Articles',url:'https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/'}], order:2 },
+      { id:'orchestration', name:'Workflow Orchestration (Airflow)', path:'Data Engineer', level:'Intermediate', estHours:30, deps:['python-etl'], resources:[{title:'Apache Airflow Docs',url:'https://airflow.apache.org/docs/'}], order:3 },
+      { id:'streaming', name:'Streaming Data (Kafka Basics)', path:'Data Engineer', level:'Advanced', estHours:26, deps:['data-warehousing'], resources:[{title:'Confluent Kafka 101',url:'https://developer.confluent.io/learn-kafka/'}], order:4 },
+      { id:'dbt-basics', name:'dbt Fundamentals', path:'Analytics Engineer', level:'Beginner', estHours:24, deps:['sql-foundations'], resources:[{title:'dbt Learn',url:'https://learn.getdbt.com/'}], order:1 },
+      { id:'dimensional-modeling', name:'Dimensional Modeling', path:'Analytics Engineer', level:'Intermediate', estHours:30, deps:['dbt-basics'], resources:[{title:'Kimball Group',url:'https://www.kimballgroup.com/'}], order:2 },
+      { id:'metrics-layer', name:'Metrics Layer & Semantic Models', path:'Analytics Engineer', level:'Advanced', estHours:28, deps:['dimensional-modeling'], resources:[{title:'dbt Blog',url:'https://www.getdbt.com/blog'}], order:3 },
+      { id:'software-eng', name:'Software Engineering for ML', path:'ML Engineer', level:'Intermediate', estHours:30, deps:['python-basics'], resources:[{title:'Full Stack Deep Learning',url:'https://fullstackdeeplearning.com/'}], order:1 },
+      { id:'model-deploy', name:'Model Deployment APIs', path:'ML Engineer', level:'Advanced', estHours:35, deps:['ml-fundamentals','software-eng'], resources:[{title:'FastAPI Docs',url:'https://fastapi.tiangolo.com/'}], order:2 },
+      { id:'mlops-monitoring', name:'MLOps Monitoring & Drift', path:'ML Engineer', level:'Advanced', estHours:26, deps:['model-deploy'], resources:[{title:'Made With ML',url:'https://madewithml.com/'}], order:3 }
+    ].map(s => ({...s,status:'Not Started',notes:'',goal:'',targetDate:'',lastStudiedDate:'',isCustom:false,optional:false}));
+
+    const seedResources = [
+      {id:uid(),name:'Kaggle Learn',url:'https://www.kaggle.com/learn',category:'Practice',type:'Course',notes:'Short applied modules',status:'Not Started',path:'Data Scientist',skillId:'python-basics',favorite:false,lastOpenedAt:''},
+      {id:uid(),name:'DataTalksClub Zoomcamps',url:'https://github.com/DataTalksClub',category:'Bootcamp',type:'Program',notes:'Practical tracks for DE/ML',status:'Not Started',path:'Data Engineer',skillId:'python-etl',favorite:false,lastOpenedAt:''}
+    ];
+
+    const defaultSettings = () => ({
+      name:'Learner',
+      primaryPath:'Data Analyst',
+      weeklyHoursTarget:10,
+      weeklySkillsTarget:2,
+      streakTarget:7,
+      dailyHoursTarget:1,
+      preferredHours:'Morning',
+      theme:'Dark',
+      startDate:isoDate(new Date()),
+      careerGoal:''
+    });
+
+    const defaultState = () => ({
+      skills:structuredClone(seedSkills),
+      resources:structuredClone(seedResources),
+      activity:{},
+      notes:'',
+      goals:'',
+      settings:defaultSettings(),
+      selectedPath:'Data Analyst',
+      isDemoData:true
+    });
+
+    const storage = (() => {
+      try {
+        localStorage.setItem('__dash_test__','1');
+        localStorage.removeItem('__dash_test__');
+        return {
+          available:true,
+          read(){
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if(!raw) return defaultState();
+            return mergeState(JSON.parse(raw));
+          },
+          write(state){ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }
+        }
+      } catch {
+        let mem = defaultState();
+        return { available:false, read(){return mem;}, write(state){mem = state;} }
+      }
+    })();
+
+    let state = storage.read();
+    const ui = {section:'dashboard', skillDrawerId:'', paletteOpen:false};
+
+    function mergeState(raw){
+      const base = defaultState();
+      if(!raw || typeof raw !== 'object') return base;
+      const map = new Map(base.skills.map(s => [s.id,s]));
+      (raw.skills||[]).forEach(s => {
+        if(!s || !s.id) return;
+        if(map.has(s.id)) map.set(s.id,{...map.get(s.id),...s,isCustom:!!s.isCustom});
+        else map.set(s.id,{
+          id:s.id,name:s.name||'Custom Skill',path:s.path||'Data Analyst',level:LEVELS.includes(s.level)?s.level:'Beginner',
+          estHours:Math.max(1,Number(s.estHours)||1),deps:Array.isArray(s.deps)?s.deps:[],resources:Array.isArray(s.resources)?s.resources:[],
+          order:Number(s.order)||999,status:STATUS_OPTIONS.includes(s.status)?s.status:'Not Started',notes:s.notes||'',goal:s.goal||'',targetDate:s.targetDate||'',lastStudiedDate:s.lastStudiedDate||'',isCustom:true,optional:!!s.optional
+        });
+      });
+      return {
+        skills:[...map.values()],
+        resources:Array.isArray(raw.resources)?raw.resources.map(r => ({
+          id:r.id||uid(),name:r.name||'Untitled',url:r.url||'',category:r.category||'General',type:r.type||'Resource',notes:r.notes||'',
+          status:STATUS_OPTIONS.includes(r.status)?r.status:'Not Started',path:r.path||'Data Analyst',skillId:r.skillId||'',favorite:!!r.favorite,lastOpenedAt:r.lastOpenedAt||''
+        })):base.resources,
+        activity:raw.activity && typeof raw.activity === 'object' ? raw.activity : {},
+        notes:typeof raw.notes==='string'?raw.notes:'',
+        goals:typeof raw.goals==='string'?raw.goals:'',
+        settings:{...defaultSettings(),...(raw.settings||{})},
+        selectedPath:raw.selectedPath || raw.settings?.primaryPath || 'Data Analyst',
+        isDemoData: typeof raw.isDemoData === 'boolean' ? raw.isDemoData : true
+      }
+    }
+
+    function persist(markReal=true){
+      if(markReal) state.isDemoData = false;
+      try { storage.write(state); } catch { toast('Unable to save now. Storage may be unavailable.'); }
+      renderAll();
+    }
+
+    function uid(){ return Math.random().toString(36).slice(2,10); }
+    function isoDate(d){ return d.toISOString().slice(0,10); }
+    function esc(s){ return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;'); }
+
+    function toast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(toast.tm);
+      toast.tm = setTimeout(()=>t.style.display='none',2200);
+    }
+
+    function statusWeight(status){ return status==='Completed'?1:status==='In Progress'?0.5:0; }
+    function skillById(id){ return state.skills.find(s=>s.id===id); }
+    function skillsByPath(path){ return state.skills.filter(s=>s.path===path).sort((a,b)=>a.order-b.order); }
+    function depsMet(skill){ return (skill.deps||[]).every(d => skillById(d)?.status === 'Completed'); }
+
+    function overallProgress(){
+      if(!state.skills.length) return 0;
+      return state.skills.reduce((a,s)=>a+statusWeight(s.status),0)/state.skills.length;
+    }
+
+    function pathProgress(path){
+      const items = skillsByPath(path);
+      if(!items.length) return 0;
+      return items.reduce((a,s)=>a+statusWeight(s.status),0)/items.length;
+    }
+
+    function pathHours(path){ return skillsByPath(path).reduce((a,s)=>a+Number(s.estHours||0),0); }
+    function completedSkillsCount(path){ return skillsByPath(path).filter(s=>s.status==='Completed').length; }
+
+    function totalHours(){ return Object.values(state.activity).reduce((a,v)=>a + Number(v.hours||0),0); }
+    function hoursForRange(days){
+      let sum=0; const now = new Date();
+      for(let i=0;i<days;i++){ const d=new Date(now); d.setDate(now.getDate()-i); sum += Number(state.activity[isoDate(d)]?.hours||0); }
+      return sum;
+    }
+    function monthHours(){
+      let sum=0; const now = new Date();
+      for(const [k,v] of Object.entries(state.activity)){
+        const d = new Date(k+'T00:00:00');
+        if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()) sum += Number(v.hours||0);
+      }
+      return sum;
+    }
+
+    function streakInfo(){
+      const days = Object.keys(state.activity).filter(d=>Number(state.activity[d]?.hours||0)>0).sort();
+      if(!days.length) return {current:0,longest:0,activeDays:0,bestDay:null};
+      let longest=1, run=1;
+      for(let i=1;i<days.length;i++){
+        if(dayDiff(days[i-1],days[i])===1) run++; else run=1;
+        if(run>longest) longest=run;
+      }
+      let current=0; let cursor = isoDate(new Date());
+      while(state.activity[cursor] && Number(state.activity[cursor].hours||0)>0){
+        current++; cursor = shiftDate(cursor,-1);
+      }
+      let bestDay = null;
+      for(const [d,v] of Object.entries(state.activity)){
+        const h=Number(v.hours||0);
+        if(!bestDay || h > bestDay.hours) bestDay={date:d,hours:h};
+      }
+      return {current,longest,activeDays:days.length,bestDay};
+    }
+
+    function dayDiff(a,b){ return Math.round((new Date(b+'T00:00:00Z')-new Date(a+'T00:00:00Z'))/86400000); }
+    function shiftDate(iso,delta){ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+delta); return isoDate(d); }
+
+    function consistencyPercent(){
+      const s = state.settings.startDate || isoDate(new Date());
+      const days = Math.max(1, dayDiff(s,isoDate(new Date()))+1);
+      return Math.min(100, Math.round((streakInfo().activeDays/days)*100));
+    }
+
+    function weeklyComparison(){
+      const thisWeek = hoursForRange(7);
+      let prev = 0;
+      for(let i=7;i<14;i++){ const d = shiftDate(isoDate(new Date()),-i); prev += Number(state.activity[d]?.hours||0); }
+      return {thisWeek,prevWeek:prev,delta:thisWeek-prev};
+    }
+
+    function nextBestSkill(){
+      const path = state.settings.primaryPath || state.selectedPath || 'Data Analyst';
+      const candidates = skillsByPath(path).filter(s=>s.status!=='Completed');
+      const available = candidates.filter(s=>depsMet(s));
+      const pool = available.length ? available : candidates;
+      if(!pool.length) return null;
+      return pool.sort((a,b)=>a.order-b.order)[0];
+    }
+
+    function remainingHours(skill){
+      if(skill.status==='Completed') return 0;
+      if(skill.status==='In Progress') return Math.max(1,Math.round(skill.estHours*0.4));
+      return Number(skill.estHours||0);
+    }
+
+    function learningLevel(){
+      const p = overallProgress()*100;
+      if(p >= 85) return 'Job Ready';
+      if(p >= 65) return 'Advanced';
+      if(p >= 35) return 'Intermediate';
+      return 'Foundation';
+    }
+
+    function momentumLabel(){
+      const d = weeklyComparison().delta;
+      if(d>1) return 'Rising';
+      if(d<-1) return 'Cooling';
+      return 'Stable';
+    }
+
+    function todayActivityDone(){ return Number(state.activity[isoDate(new Date())]?.hours||0) > 0; }
+
+    function achievements(){
+      const s = streakInfo();
+      const completed = state.skills.filter(k=>k.status==='Completed').length;
+      const total = totalHours();
+      const pathDone = Object.keys(PATHS).some(p=>pathProgress(p)===1);
+      const list = [
+        {id:'first-skill',title:'First Skill Completed',done:completed>=1},
+        {id:'hours-10',title:'10 Hours Learned',done:total>=10},
+        {id:'streak-7',title:'7 Day Streak',done:s.longest>=7},
+        {id:'hours-25',title:'25 Hours Learned',done:total>=25},
+        {id:'skills-10',title:'10 Skills Completed',done:completed>=10},
+        {id:'path-complete',title:'First Career Path Completed',done:pathDone},
+        {id:'streak-30',title:'30 Day Streak',done:s.longest>=30},
+        {id:'job-ready',title:'Job Ready Milestone',done:overallProgress()>=0.85}
+      ];
+      return list;
+    }
+
+    function recentActivity(limit=6){
+      return Object.entries(state.activity)
+        .sort((a,b)=>b[0].localeCompare(a[0]))
+        .slice(0,limit)
+        .map(([date,v])=>({date,hours:Number(v.hours||0),skillId:v.skillId||'',topic:v.topic||'',note:v.note||''}));
+    }
+
+    function learningStatusClass(status){
+      if(status==='Completed') return 'st-good';
+      if(status==='In Progress') return 'st-warn';
+      return 'st-bad';
+    }
+
+    function renderNav(){
+      const d = document.getElementById('desktopNav');
+      const m = document.getElementById('mobileNav');
+      d.innerHTML = '';
+      m.innerHTML = '';
+      NAV_ITEMS.forEach(item => {
+        const b = document.createElement('button');
+        b.className = 'nav-btn' + (ui.section===item.id?' active':'');
+        b.innerHTML = `<span class="nav-icon">${item.icon}</span><span>${item.label}</span>`;
+        b.type='button';
+        b.onclick = () => showSection(item.id);
+        d.appendChild(b);
+
+        const mb = document.createElement('button');
+        mb.className='mnav'+(ui.section===item.id?' active':'');
+        mb.type='button';
+        mb.innerHTML = `<span>${item.icon}</span><span>${item.label.split(' ')[0]}</span>`;
+        mb.onclick = () => showSection(item.id);
+        m.appendChild(mb);
+      });
+    }
+
+    function showSection(id){
+      ui.section = id;
+      NAV_ITEMS.forEach(n => {
+        document.getElementById(n.section).classList.toggle('active',n.id===id);
+      });
+      document.getElementById('sectionTitle').textContent = NAV_ITEMS.find(n=>n.id===id)?.label || 'Dashboard';
+      renderNav();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function renderStorageNotice(){
+      const el = document.getElementById('storageNotice');
+      if(storage.available){ el.classList.add('hidden'); return; }
+      el.classList.remove('hidden');
+      el.innerHTML = `<strong style="color:var(--danger)">Storage unavailable:</strong> data is temporary in this session. Export JSON backups often.`;
+    }
+
+    function renderTopProfile(){
+      const name = (state.settings.name||'Learner').trim() || 'Learner';
+      document.getElementById('topName').textContent = name;
+      document.getElementById('topPath').textContent = state.settings.primaryPath || 'Primary Path';
+      document.getElementById('topAvatar').textContent = name[0]?.toUpperCase() || 'U';
+      document.getElementById('demoTag').innerHTML = state.isDemoData
+        ? 'Using <strong>demo seed content</strong>. Update data to personalize, or use reset/import in Goals & Notes.'
+        : 'Personal data mode active. Export backups periodically.';
+    }
+
+    function renderDashboard(){
+      const el = document.getElementById('dashboardSection');
+      const progress = Math.round(overallProgress()*100);
+      const next = nextBestSkill();
+      const streak = streakInfo();
+      const weekly = weeklyComparison();
+      const today = Number(state.activity[isoDate(new Date())]?.hours||0);
+      const currentPath = state.settings.primaryPath || state.selectedPath;
+      const pathP = Math.round(pathProgress(currentPath)*100);
+      const completed = state.skills.filter(s=>s.status==='Completed').length;
+      const remaining = state.skills.length-completed;
+      const goalText = state.settings.careerGoal || state.goals || 'Define your career goal in Goals & Notes to personalize recommendations.';
+
+      el.innerHTML = `
+        <div class="hero">
+          <div class="surface">
+            <div style="display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap;align-items:flex-start">
+              <div>
+                <h3 style="font-size:1.4rem;margin:0">Command Center</h3>
+                <div class="muted">Where am I → what next → how close to goal.</div>
+              </div>
+              <span class="pill">${currentPath}</span>
+            </div>
+            <div class="ring-wrap" style="margin-top:.75rem">
+              <div class="ring" aria-label="Overall career progress">
+                <svg width="170" height="170" viewBox="0 0 170 170">
+                  <circle cx="85" cy="85" r="72" stroke="#20375f" stroke-width="14" fill="none"></circle>
+                  <circle cx="85" cy="85" r="72" stroke="url(#grad1)" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="452" stroke-dashoffset="${452-(452*progress/100)}"></circle>
+                  <defs><linearGradient id="grad1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5e8cff"/><stop offset="100%" stop-color="#40d2ff"/></linearGradient></defs>
+                </svg>
+                <div class="center">
+                  <div><strong data-count="${progress}">${progress}</strong><span>%</span><div class="tiny muted">Overall</div></div>
+                </div>
+              </div>
+              <div style="flex:1;min-width:200px" class="grid g2">
+                <div class="surface flat"><div class="tiny muted">Current level</div><div class="metric">${learningLevel()}</div><div class="tiny muted">Momentum: ${momentumLabel()}</div></div>
+                <div class="surface flat ${todayActivityDone()?'celebrate':''}"><div class="tiny muted">Today's learning</div><div class="metric">${today.toFixed(1)}h</div><div class="tiny muted">Target: ${Number(state.settings.dailyHoursTarget||1)}h</div></div>
+                <div class="surface flat"><div class="tiny muted">Skills completed</div><div class="metric" data-count="${completed}">${completed}</div><div class="tiny muted">Remaining ${remaining}</div></div>
+                <div class="surface flat"><div class="tiny muted">Current streak</div><div class="metric" data-count="${streak.current}">${streak.current}</div><div class="tiny muted">Longest ${streak.longest}</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="surface">
+            <h3 style="margin:.1rem 0 .2rem">Continue Learning</h3>
+            ${next ? `
+              <div class="subtle-item" style="margin-top:.5rem">
+                <div>
+                  <strong>${esc(next.name)}</strong>
+                  <div class="tiny muted">${esc(next.path)} • ${next.level}</div>
+                </div>
+                <span class="pill ${learningStatusClass(next.status)}">${next.status}</span>
+              </div>
+              <div style="margin-top:.55rem" class="tiny muted">Estimated remaining: ~${remainingHours(next)}h</div>
+              <div style="margin-top:.4rem" class="progress-track"><span style="width:${Math.round(statusWeight(next.status)*100)}%"></span></div>
+              <div class="tiny muted" style="margin-top:.4rem">Prerequisites: ${(next.deps||[]).length} • Completed ${(next.deps||[]).filter(id=>skillById(id)?.status==='Completed').length}</div>
+              <div style="display:flex;gap:.45rem;margin-top:.6rem;flex-wrap:wrap">
+                <button class="btn primary" type="button" id="continueBtn">Continue Learning</button>
+                <button class="btn" type="button" id="markNextDone">Mark Completed</button>
+              </div>
+            ` : `<div class="tiny muted" style="margin-top:.7rem">No pending skills in your primary path. Great work—consider adding advanced custom skills.</div>`}
+            <div class="surface flat" style="margin-top:.72rem">
+              <div class="tiny muted">Current goal</div>
+              <div>${esc(goalText)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid g3">
+          <div class="surface">
+            <h4>Your next step</h4>
+            ${next ? `<div><strong>${esc(next.name)}</strong></div><div class="tiny muted">Complete this next based on dependencies and current path focus.</div><div class="tiny muted" style="margin-top:.4rem">~${remainingHours(next)}h remaining</div>` : `<div class="tiny muted">You're currently clear on required skills. Add projects and interview prep as next actions.</div>`}
+          </div>
+          <div class="surface">
+            <h4>Weekly progress</h4>
+            <div class="metric">${weekly.thisWeek.toFixed(1)}h</div>
+            <div class="tiny muted">Goal: ${Number(state.settings.weeklyHoursTarget||10)}h • ${weekly.delta>=0?'+':''}${weekly.delta.toFixed(1)}h vs last week</div>
+            <div style="margin-top:.45rem" class="progress-track"><span style="width:${Math.min(100,Math.round((weekly.thisWeek/Math.max(1,Number(state.settings.weeklyHoursTarget||10)))*100))}%"></span></div>
+          </div>
+          <div class="surface">
+            <h4>Learning momentum</h4>
+            <div class="metric">${consistencyPercent()}%</div>
+            <div class="tiny muted">Consistency since ${esc(state.settings.startDate||isoDate(new Date()))}</div>
+            <div class="tiny muted" style="margin-top:.4rem">Best day: ${streak.bestDay ? `${streak.bestDay.date} (${streak.bestDay.hours}h)` : 'Not yet logged'}</div>
+          </div>
+        </div>
+
+        <div class="grid g2">
+          <div class="surface">
+            <h4>Career path comparison</h4>
+            <div class="subtle-list">
+              ${Object.keys(PATHS).map(p=>`<div class="subtle-item"><span>${esc(p)}</span><span>${Math.round(pathProgress(p)*100)}%</span></div>`).join('')}
+            </div>
+          </div>
+          <div class="surface">
+            <h4>Recent activity</h4>
+            ${renderActivityListMarkup(5,true)}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('continueBtn')?.addEventListener('click',() => {
+        ui.skillDrawerId = next?.id || '';
+        if(next) openSkillDrawer(next.id);
+      });
+      document.getElementById('markNextDone')?.addEventListener('click',() => {
+        if(!next) return;
+        next.status='Completed';
+        next.lastStudiedDate = isoDate(new Date());
+        persist();
+        toast('Great work — skill completed.');
+      });
+
+      animateCounters(el);
+    }
+
+    function renderActivityListMarkup(limit=8, compact=false){
+      const rows = recentActivity(limit);
+      if(!rows.length) return `<div class="surface flat"><div class="tiny muted">No activity yet. Log your first session in Activity to start your streak.</div><button class="btn" type="button" onclick="window.__go('activity')">Log Today's Activity</button></div>`;
+      return `<div class="table-wrap"><table><thead><tr><th>Date</th><th>Hours</th>${compact?'':'<th>Skill</th>'}<th>Note</th></tr></thead><tbody>${rows.map(r => `<tr><td>${r.date}</td><td>${r.hours.toFixed(1)}</td>${compact?'':`<td>${esc(skillById(r.skillId)?.name || r.topic || '—')}</td>`}<td>${esc(r.note||r.topic||'—')}</td></tr>`).join('')}</tbody></table></div>`;
+    }
+
+    function renderCareerPaths(){
+      const el = document.getElementById('careerSection');
+      el.innerHTML = `
+        <div class="surface">
+          <h3>Career Journeys</h3>
+          <div class="muted">Select a primary path to personalize recommendations and your dashboard focus.</div>
+        </div>
+        <div class="grid g2" style="margin-top:.85rem">
+          ${Object.entries(PATHS).map(([path,meta]) => {
+            const total = skillsByPath(path).length;
+            const done = completedSkillsCount(path);
+            const progress = Math.round(pathProgress(path)*100);
+            const next = skillsByPath(path).find(s=>s.status!=='Completed' && depsMet(s)) || skillsByPath(path).find(s=>s.status!=='Completed');
+            const selected = state.settings.primaryPath===path;
+            return `<article class="surface">
+              <div style="display:flex;justify-content:space-between;gap:.5rem;align-items:flex-start">
+                <h4 style="margin:0">${esc(path)}</h4>
+                <span class="pill ${selected?'st-good':''}">${selected?'Primary':'Track'}</span>
+              </div>
+              <div class="tiny muted" style="margin-top:.3rem">${esc(meta.desc)}</div>
+              <div class="label-row" style="margin-top:.5rem">
+                <span class="pill">Difficulty: ${meta.difficulty}</span>
+                <span class="pill">Est. ${pathHours(path)}h</span>
+                <span class="pill">${done}/${total} skills completed</span>
+              </div>
+              <div style="margin-top:.55rem" class="progress-track"><span style="width:${progress}%"></span></div>
+              <div class="tiny muted" style="margin-top:.35rem">Recommended next: ${esc(next?.name || 'Path complete')}</div>
+              <div class="tiny muted" style="margin-top:.25rem">Tools: ${meta.tools.join(' • ')}</div>
+              <div style="display:flex;gap:.45rem;margin-top:.65rem;flex-wrap:wrap">
+                <button class="btn primary" data-primary-path="${esc(path)}" type="button">Set Primary Path</button>
+                <button class="btn" data-open-roadmap="${esc(path)}" type="button">View Roadmap</button>
+              </div>
+            </article>`;
+          }).join('')}
+        </div>
+      `;
+      el.querySelectorAll('[data-primary-path]').forEach(btn => btn.onclick = () => {
+        const p = btn.dataset.primaryPath;
+        state.settings.primaryPath = p;
+        state.selectedPath = p;
+        persist();
+        toast('Primary career path updated.');
+      });
+      el.querySelectorAll('[data-open-roadmap]').forEach(btn => btn.onclick = () => {
+        state.selectedPath = btn.dataset.openRoadmap;
+        renderRoadmap();
+        showSection('roadmap');
+      });
+    }
+
+    function skillJourneyState(skill){
+      if(skill.status==='Completed') return 'completed';
+      if(skill.status==='In Progress') return 'inprogress';
+      return depsMet(skill) ? 'available' : 'locked';
+    }
+
+    function renderRoadmap(){
+      const el = document.getElementById('roadmapSection');
+      const selected = state.selectedPath || state.settings.primaryPath || 'Data Analyst';
+      const pathOptions = Object.keys(PATHS).map(p=>`<option ${p===selected?'selected':''}>${esc(p)}</option>`).join('');
+      const statusOptions = ['All', ...STATUS_OPTIONS, 'Locked', 'Available'].map(s=>`<option>${s}</option>`).join('');
+      el.innerHTML = `
+        <div class="surface">
+          <div style="display:flex;justify-content:space-between;gap:.6rem;align-items:flex-start;flex-wrap:wrap">
+            <div>
+              <h3 style="margin:0">Learning Journey</h3>
+              <div class="muted">Foundation → Core Skills → Advanced Skills → Projects → Job Ready</div>
+            </div>
+            <div class="label-row"><span class="pill">Primary: ${esc(state.settings.primaryPath)}</span><span class="pill">Path progress ${Math.round(pathProgress(selected)*100)}%</span></div>
+          </div>
+          <div class="grid g3" style="margin-top:.7rem">
+            <div class="field"><label>Career path</label><select id="roadmapPathFilter">${pathOptions}</select></div>
+            <div class="field"><label>Status</label><select id="roadmapStatusFilter">${statusOptions}</select></div>
+            <div class="field"><label>Phase</label><select id="roadmapPhaseFilter"><option>All</option><option>Foundation</option><option>Core Skills</option><option>Advanced Skills</option><option>Projects</option><option>Job Ready</option></select></div>
+          </div>
+        </div>
+        <div class="grid g2" style="margin-top:.8rem">
+          <div class="surface"><h4>Roadmap Timeline</h4><div id="roadmapTimeline" class="timeline"></div></div>
+          <div class="surface"><h4>Journey Guidance</h4><div id="roadmapGuide"></div></div>
+        </div>
+      `;
+
+      const redraw = () => {
+        const path = el.querySelector('#roadmapPathFilter').value;
+        state.selectedPath = path;
+        const st = el.querySelector('#roadmapStatusFilter').value;
+        const phase = el.querySelector('#roadmapPhaseFilter').value;
+        const list = skillsByPath(path).filter(s => {
+          const journey = skillJourneyState(s);
+          const stOk = st==='All' || st===s.status || (st==='Locked'&&journey==='locked') || (st==='Available'&&journey==='available');
+          const phaseName = PHASE_BY_LEVEL[s.level] || 'Core Skills';
+          const phOk = phase==='All' || phase===phaseName;
+          return stOk && phOk;
+        });
+
+        const t = el.querySelector('#roadmapTimeline');
+        if(!list.length){
+          t.innerHTML = `<div class="surface flat"><div class="tiny muted">No roadmap items match this filter. Try expanding status/phase selections.</div></div>`;
+        } else {
+          t.innerHTML = list.map(s => {
+            const journey = skillJourneyState(s);
+            const phaseName = PHASE_BY_LEVEL[s.level] || 'Core Skills';
+            const depDone = (s.deps||[]).filter(d=>skillById(d)?.status==='Completed').length;
+            return `<button class="node ${journey==='completed'?'completed':journey==='inprogress'?'inprogress':''} ${journey==='locked'?'locked':''}" data-open-skill="${s.id}" type="button">
+              <div style="display:flex;justify-content:space-between;gap:.4rem;align-items:flex-start;flex-wrap:wrap"><strong>${esc(s.name)}</strong><span class="pill ${learningStatusClass(s.status)}">${s.status}</span></div>
+              <div class="tiny muted">${phaseName} • ~${s.estHours}h • ${journey==='locked'?'Locked':'Ready'}</div>
+              <div class="tiny muted">Prerequisites ${depDone}/${(s.deps||[]).length}</div>
+            </button>`;
+          }).join('') + `<div class="node" style="cursor:default"><strong>Projects</strong><div class="tiny muted">Build 2 portfolio projects aligned with ${esc(path)}.</div></div><div class="node" style="cursor:default"><strong>Job Ready</strong><div class="tiny muted">Mock interviews, resume stories, and applied case studies.</div></div>`;
+        }
+
+        const next = skillsByPath(path).find(s=>s.status!=='Completed' && depsMet(s)) || skillsByPath(path).find(s=>s.status!=='Completed');
+        el.querySelector('#roadmapGuide').innerHTML = `
+          <div class="subtle-list">
+            <div class="subtle-item"><span>Next recommended skill</span><strong>${esc(next?.name || 'Path complete')}</strong></div>
+            <div class="subtle-item"><span>Completed skills</span><strong>${completedSkillsCount(path)}</strong></div>
+            <div class="subtle-item"><span>Remaining estimated hours</span><strong>${skillsByPath(path).filter(s=>s.status!=='Completed').reduce((a,s)=>a+remainingHours(s),0)}h</strong></div>
+          </div>
+          <div class="tiny muted" style="margin-top:.7rem">Click any roadmap node to open detail panel, update status, add notes/goal date, and access resources.</div>
+        `;
+
+        t.querySelectorAll('[data-open-skill]').forEach(btn => btn.onclick = () => openSkillDrawer(btn.dataset.openSkill));
+      };
+
+      el.querySelector('#roadmapPathFilter').onchange = redraw;
+      el.querySelector('#roadmapStatusFilter').onchange = redraw;
+      el.querySelector('#roadmapPhaseFilter').onchange = redraw;
+      redraw();
+    }
+
+    function openSkillDrawer(skillId){
+      const skill = skillById(skillId);
+      if(!skill) return;
+      ui.skillDrawerId = skillId;
+      const panel = document.getElementById('skillDrawer');
+      const body = document.getElementById('drawerBody');
+      document.getElementById('drawerTitle').textContent = `${skill.name} • ${skill.path}`;
+      body.innerHTML = `
+        <div class="grid g2" style="margin-top:.6rem">
+          <div class="field"><label>Status</label><select id="drawerStatus">${STATUS_OPTIONS.map(s=>`<option ${s===skill.status?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div class="field"><label>Estimated hours</label><input id="drawerHours" type="number" min="1" value="${Number(skill.estHours||1)}" /></div>
+          <div class="field"><label>Goal</label><input id="drawerGoal" value="${esc(skill.goal||'')}" /></div>
+          <div class="field"><label>Target date</label><input id="drawerDate" type="date" value="${esc(skill.targetDate||'')}" /></div>
+        </div>
+        <div class="field" style="margin-top:.6rem"><label>Notes</label><textarea id="drawerNotes">${esc(skill.notes||'')}</textarea></div>
+        <div class="surface flat" style="margin-top:.65rem">
+          <strong>Dependencies</strong>
+          <div class="tiny muted" style="margin-top:.25rem">${(skill.deps||[]).length ? skill.deps.map(d=>`${esc(skillById(d)?.name||d)} (${skillById(d)?.status||'Not Started'})`).join(' • ') : 'No prerequisites.'}</div>
+        </div>
+        <div class="surface flat" style="margin-top:.65rem">
+          <strong>Free resources</strong>
+          <ul>${(skill.resources||[]).length ? skill.resources.map(r=>`<li><a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.title)}</a></li>`).join('') : '<li class="tiny muted">No resources added.</li>'}</ul>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem">
+          <button class="btn primary" id="drawerSave" type="button">Save Skill Updates</button>
+          <button class="btn" id="drawerComplete" type="button">Mark Completed</button>
+        </div>
+      `;
+
+      body.querySelector('#drawerSave').onclick = () => {
+        skill.status = body.querySelector('#drawerStatus').value;
+        skill.estHours = Math.max(1, Number(body.querySelector('#drawerHours').value||1));
+        skill.goal = body.querySelector('#drawerGoal').value.trim();
+        skill.targetDate = body.querySelector('#drawerDate').value;
+        skill.notes = body.querySelector('#drawerNotes').value;
+        if(skill.status==='Completed') skill.lastStudiedDate = isoDate(new Date());
+        persist();
+        toast('Skill updated.');
+      };
+      body.querySelector('#drawerComplete').onclick = () => {
+        skill.status='Completed';
+        skill.lastStudiedDate = isoDate(new Date());
+        persist();
+        toast('Skill marked completed.');
+      };
+
+      panel.classList.add('open');
+      panel.setAttribute('aria-hidden','false');
+    }
+
+    function closeSkillDrawer(){
+      const panel = document.getElementById('skillDrawer');
+      panel.classList.remove('open');
+      panel.setAttribute('aria-hidden','true');
+    }
+
+    function renderProgress(){
+      const el = document.getElementById('progressSection');
+      const weekly = weeklyComparison();
+      const streak = streakInfo();
+      const completed = state.skills.filter(s=>s.status==='Completed').length;
+      const inProgress = state.skills.filter(s=>s.status==='In Progress').length;
+      const notStarted = state.skills.filter(s=>s.status==='Not Started').length;
+      const total = state.skills.length;
+
+      el.innerHTML = `
+        <div class="grid g4">
+          <div class="surface"><div class="tiny muted">Overall completion</div><div class="metric" data-count="${Math.round(overallProgress()*100)}">${Math.round(overallProgress()*100)}</div><div class="metric-sub">% across all skills</div></div>
+          <div class="surface"><div class="tiny muted">Total learning hours</div><div class="metric" data-count="${totalHours().toFixed(1)}">${totalHours().toFixed(1)}</div><div class="metric-sub">${hoursForRange(7).toFixed(1)}h this week</div></div>
+          <div class="surface"><div class="tiny muted">Active days</div><div class="metric" data-count="${streak.activeDays}">${streak.activeDays}</div><div class="metric-sub">Consistency ${consistencyPercent()}%</div></div>
+          <div class="surface"><div class="tiny muted">Current streak</div><div class="metric" data-count="${streak.current}">${streak.current}</div><div class="metric-sub">Longest ${streak.longest}</div></div>
+        </div>
+
+        <div class="grid g2" style="margin-top:.8rem">
+          <div class="surface">
+            <h4>Career → Path → Skill Progress</h4>
+            <div class="subtle-list">
+              ${Object.keys(PATHS).map(p => {
+                const skills = skillsByPath(p);
+                const done = skills.filter(s=>s.status==='Completed').length;
+                return `<div class="subtle-item"><div><strong>${esc(p)}</strong><div class="tiny muted">${done}/${skills.length} skills</div></div><div style="min-width:120px"><div class="progress-track"><span style="width:${Math.round(pathProgress(p)*100)}%"></span></div><div class="tiny muted" style="text-align:right">${Math.round(pathProgress(p)*100)}%</div></div></div>`;
+              }).join('')}
+            </div>
+            <div class="label-row" style="margin-top:.65rem"><span class="pill st-good">Completed ${completed}</span><span class="pill st-warn">In Progress ${inProgress}</span><span class="pill st-bad">Not Started ${notStarted}</span></div>
+          </div>
+          <div class="surface">
+            <h4>Weekly Goals</h4>
+            <div class="subtle-item"><span>Hours goal</span><strong>${weekly.thisWeek.toFixed(1)} / ${Number(state.settings.weeklyHoursTarget||10)}h</strong></div>
+            <div style="margin-top:.45rem" class="progress-track"><span style="width:${Math.min(100,Math.round((weekly.thisWeek/Math.max(1,Number(state.settings.weeklyHoursTarget||10)))*100))}%"></span></div>
+            <div class="subtle-item" style="margin-top:.55rem"><span>Skills goal</span><strong>${completed} / ${Number(state.settings.weeklySkillsTarget||2)}+</strong></div>
+            <div class="tiny muted" style="margin-top:.5rem">This week vs last week: ${weekly.thisWeek.toFixed(1)}h vs ${weekly.prevWeek.toFixed(1)}h (${weekly.delta>=0?'+':''}${weekly.delta.toFixed(1)}h)</div>
+          </div>
+        </div>
+
+        <div class="surface" style="margin-top:.8rem">
+          <h4>Detailed Skill Matrix</h4>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Path</th><th>Skill</th><th>Difficulty</th><th>Hours</th><th>Status</th><th>Dependencies</th><th>Goal Date</th><th>Last Studied</th></tr></thead>
+              <tbody>
+                ${state.skills.sort((a,b)=>a.path.localeCompare(b.path)||a.order-b.order||a.name.localeCompare(b.name)).map(s => `<tr>
+                  <td>${esc(s.path)}</td>
+                  <td>${esc(s.name)} ${s.isCustom?'<span class="pill">Custom</span>':''}</td>
+                  <td>${esc(s.level)}</td>
+                  <td>${s.estHours}h</td>
+                  <td><span class="pill ${learningStatusClass(s.status)}">${s.status}</span></td>
+                  <td>${(s.deps||[]).map(d=>esc(skillById(d)?.name||d)).join(', ') || 'None'}</td>
+                  <td>${esc(s.targetDate||'—')}</td>
+                  <td>${esc(s.lastStudiedDate||'—')}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      animateCounters(el);
+    }
+
+    function renderResources(){
+      const el = document.getElementById('resourcesSection');
+      const pathOptions = Object.keys(PATHS).map(p=>`<option>${esc(p)}</option>`).join('');
+      const skillOptions = `<option value="">General</option>` + state.skills.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+
+      el.innerHTML = `
+        <div class="surface">
+          <h3>Resource Library</h3>
+          <div class="muted">Search, filter, bookmark, and track resources mapped to your career path and skills.</div>
+          <form id="resourceForm" style="margin-top:.7rem">
+            <input type="hidden" id="resourceId" />
+            <div class="grid g3">
+              <div class="field"><label>Name</label><input id="resourceName" required /></div>
+              <div class="field"><label>URL</label><input id="resourceUrl" type="url" placeholder="https://..." required /></div>
+              <div class="field"><label>Category</label><input id="resourceCategory" placeholder="Course / Docs / Practice" required /></div>
+            </div>
+            <div class="grid g4" style="margin-top:.6rem">
+              <div class="field"><label>Type</label><input id="resourceType" placeholder="Video, Course, Article" /></div>
+              <div class="field"><label>Status</label><select id="resourceStatus">${STATUS_OPTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div>
+              <div class="field"><label>Career path</label><select id="resourcePath">${pathOptions}</select></div>
+              <div class="field"><label>Associated skill</label><select id="resourceSkill">${skillOptions}</select></div>
+            </div>
+            <div class="field" style="margin-top:.6rem"><label>Notes</label><textarea id="resourceNotes"></textarea></div>
+            <div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.6rem"><button class="btn primary" type="submit">Save Resource</button><button class="btn" id="resourceClear" type="button">Clear</button></div>
+          </form>
+        </div>
+
+        <div class="surface" style="margin-top:.8rem">
+          <div class="grid g4">
+            <div class="field"><label>Search</label><input id="resourceSearch" placeholder="Find by name/notes/category" /></div>
+            <div class="field"><label>Path filter</label><select id="resourcePathFilter"><option>All</option>${pathOptions}</select></div>
+            <div class="field"><label>Skill filter</label><select id="resourceSkillFilter"><option value="">All Skills</option>${skillOptions}</select></div>
+            <div class="field"><label>Status/Favorites</label><select id="resourceStatusFilter"><option>All</option>${STATUS_OPTIONS.map(s=>`<option>${s}</option>`).join('')}<option>Favorites</option><option>Recently Opened</option></select></div>
+          </div>
+          <div id="resourceList" class="grid g2" style="margin-top:.8rem"></div>
+        </div>
+      `;
+
+      const form = el.querySelector('#resourceForm');
+      const clearForm = () => { form.reset(); el.querySelector('#resourceId').value=''; };
+      el.querySelector('#resourceClear').onclick = clearForm;
+
+      form.onsubmit = (ev) => {
+        ev.preventDefault();
+        const payload = {
+          id:el.querySelector('#resourceId').value||uid(),
+          name:el.querySelector('#resourceName').value.trim(),
+          url:el.querySelector('#resourceUrl').value.trim(),
+          category:el.querySelector('#resourceCategory').value.trim(),
+          type:el.querySelector('#resourceType').value.trim()||'Resource',
+          notes:el.querySelector('#resourceNotes').value.trim(),
+          status:el.querySelector('#resourceStatus').value,
+          path:el.querySelector('#resourcePath').value,
+          skillId:el.querySelector('#resourceSkill').value,
+          favorite:false,
+          lastOpenedAt:''
+        };
+        if(!payload.name || !payload.url || !payload.category) return toast('Please fill required resource fields.');
+        if(!/^https?:\/\//i.test(payload.url)) return toast('URL must start with http:// or https://');
+        const idx = state.resources.findIndex(r=>r.id===payload.id);
+        if(idx>=0) state.resources[idx] = {...state.resources[idx],...payload}; else state.resources.unshift(payload);
+        persist();
+        clearForm();
+        toast('Resource saved.');
+      };
+
+      const redraw = () => {
+        const q = el.querySelector('#resourceSearch').value.trim().toLowerCase();
+        const pf = el.querySelector('#resourcePathFilter').value;
+        const sf = el.querySelector('#resourceSkillFilter').value;
+        const st = el.querySelector('#resourceStatusFilter').value;
+
+        let list = state.resources.filter(r => {
+          const text = `${r.name} ${r.notes} ${r.category} ${r.type}`.toLowerCase();
+          const matchQ = !q || text.includes(q);
+          const matchP = pf==='All' || r.path===pf;
+          const matchS = !sf || r.skillId===sf;
+          const matchSt = st==='All' || r.status===st || (st==='Favorites'&&r.favorite) || (st==='Recently Opened'&&!!r.lastOpenedAt);
+          return matchQ && matchP && matchS && matchSt;
+        });
+
+        const holder = el.querySelector('#resourceList');
+        if(!list.length){
+          holder.innerHTML = `<div class="surface flat"><strong>No resources match this view.</strong><div class="tiny muted">Add a resource or relax filters to see your library.</div><button class="btn" type="button" onclick="window.__go('resources')">Add Resource</button></div>`;
+          return;
+        }
+
+        list = list.sort((a,b)=> (b.lastOpenedAt||'').localeCompare(a.lastOpenedAt||'') || a.name.localeCompare(b.name));
+        holder.innerHTML = list.map(r => `<article class="resource-card">
+          <div style="display:flex;justify-content:space-between;gap:.5rem;align-items:flex-start;flex-wrap:wrap">
+            <div>
+              <strong>${esc(r.name)}</strong>
+              <div class="tiny muted">${esc(r.type||'Resource')} • ${esc(r.category)} • ${esc(r.path)} • ${esc(skillById(r.skillId)?.name||'General')}</div>
+            </div>
+            <span class="pill ${learningStatusClass(r.status)}">${r.status}</span>
+          </div>
+          <div class="tiny muted" style="margin-top:.4rem">${esc(r.notes||'No notes yet')}</div>
+          <div class="tiny muted" style="margin-top:.28rem">Last opened: ${esc(r.lastOpenedAt||'Never')}</div>
+          <div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.6rem">
+            <button class="btn" data-open-resource="${r.id}" type="button">Open</button>
+            <button class="btn" data-toggle-resource="${r.id}" type="button">${r.status==='Completed'?'Mark In Progress':'Mark Completed'}</button>
+            <button class="btn" data-fav-resource="${r.id}" type="button">${r.favorite?'★ Favorited':'☆ Favorite'}</button>
+            <button class="btn" data-edit-resource="${r.id}" type="button">Edit</button>
+            <button class="btn warn" data-del-resource="${r.id}" type="button">Delete</button>
+          </div>
+        </article>`).join('');
+
+        holder.querySelectorAll('[data-open-resource]').forEach(btn => btn.onclick = () => {
+          const r = state.resources.find(x=>x.id===btn.dataset.openResource);
+          if(!r) return;
+          r.lastOpenedAt = new Date().toISOString();
+          persist();
+          window.open(r.url,'_blank','noopener,noreferrer');
+        });
+
+        holder.querySelectorAll('[data-toggle-resource]').forEach(btn => btn.onclick = () => {
+          const r = state.resources.find(x=>x.id===btn.dataset.toggleResource);
+          if(!r) return;
+          r.status = r.status==='Completed' ? 'In Progress' : 'Completed';
+          persist();
+        });
+
+        holder.querySelectorAll('[data-fav-resource]').forEach(btn => btn.onclick = () => {
+          const r = state.resources.find(x=>x.id===btn.dataset.favResource);
+          if(!r) return;
+          r.favorite = !r.favorite;
+          persist();
+        });
+
+        holder.querySelectorAll('[data-edit-resource]').forEach(btn => btn.onclick = () => {
+          const r = state.resources.find(x=>x.id===btn.dataset.editResource);
+          if(!r) return;
+          el.querySelector('#resourceId').value = r.id;
+          el.querySelector('#resourceName').value = r.name;
+          el.querySelector('#resourceUrl').value = r.url;
+          el.querySelector('#resourceCategory').value = r.category;
+          el.querySelector('#resourceType').value = r.type||'';
+          el.querySelector('#resourceStatus').value = r.status;
+          el.querySelector('#resourcePath').value = r.path;
+          el.querySelector('#resourceSkill').value = r.skillId||'';
+          el.querySelector('#resourceNotes').value = r.notes||'';
+          toast('Resource loaded for editing.');
+        });
+
+        holder.querySelectorAll('[data-del-resource]').forEach(btn => btn.onclick = () => {
+          if(!confirm('Delete this resource?')) return;
+          state.resources = state.resources.filter(x=>x.id!==btn.dataset.delResource);
+          persist();
+        });
+      };
+
+      ['resourceSearch','resourcePathFilter','resourceSkillFilter','resourceStatusFilter'].forEach(id => el.querySelector('#'+id).oninput = redraw);
+      el.querySelector('#resourcePathFilter').onchange = redraw;
+      el.querySelector('#resourceSkillFilter').onchange = redraw;
+      el.querySelector('#resourceStatusFilter').onchange = redraw;
+      redraw();
+    }
+
+    function renderSkills(){
+      const el = document.getElementById('skillsSection');
+      const pathOpts = Object.keys(PATHS).map(p=>`<option>${esc(p)}</option>`).join('');
+      const depOpts = state.skills.map(s=>`<option value="${s.id}">${esc(s.name)} (${esc(s.path)})</option>`).join('');
+
+      el.innerHTML = `
+        <div class="surface">
+          <h3>Skill Management</h3>
+          <div class="muted">Manage default and custom skills with dependencies, goals, notes, and progress state.</div>
+          <form id="skillForm" style="margin-top:.7rem">
+            <input type="hidden" id="skillId" />
+            <div class="grid g4">
+              <div class="field"><label>Skill name</label><input id="skillName" required /></div>
+              <div class="field"><label>Path</label><select id="skillPath">${pathOpts}</select></div>
+              <div class="field"><label>Difficulty</label><select id="skillLevel">${LEVELS.map(l=>`<option>${l}</option>`).join('')}</select></div>
+              <div class="field"><label>Estimated hours</label><input id="skillHours" type="number" min="1" value="10" /></div>
+            </div>
+            <div class="grid g3" style="margin-top:.6rem">
+              <div class="field"><label>Status</label><select id="skillStatus">${STATUS_OPTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div>
+              <div class="field"><label>Goal</label><input id="skillGoal" /></div>
+              <div class="field"><label>Target date</label><input id="skillTarget" type="date" /></div>
+            </div>
+            <div class="field" style="margin-top:.6rem"><label>Dependencies (Ctrl/Cmd + click for multi-select)</label><select id="skillDeps" multiple size="5">${depOpts}</select></div>
+            <div class="field" style="margin-top:.6rem"><label>Notes</label><textarea id="skillNotes"></textarea></div>
+            <div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.6rem"><button class="btn primary" type="submit">Save Skill</button><button class="btn" id="skillClear" type="button">Clear</button></div>
+          </form>
+        </div>
+
+        <div class="surface" style="margin-top:.8rem">
+          <div class="grid g3">
+            <div class="field"><label>Search</label><input id="skillSearch" placeholder="Search skill name/path/notes" /></div>
+            <div class="field"><label>Path filter</label><select id="skillPathFilter"><option>All</option>${pathOpts}</select></div>
+            <div class="field"><label>Status filter</label><select id="skillStatusFilter"><option>All</option>${STATUS_OPTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div>
+          </div>
+          <div id="skillCards" class="grid g2" style="margin-top:.75rem"></div>
+        </div>
+      `;
+
+      const form = el.querySelector('#skillForm');
+      const clear = () => { form.reset(); el.querySelector('#skillId').value=''; el.querySelector('#skillHours').value='10'; };
+      el.querySelector('#skillClear').onclick = clear;
+
+      form.onsubmit = (ev) => {
+        ev.preventDefault();
+        const id = el.querySelector('#skillId').value || uid();
+        const deps = Array.from(el.querySelector('#skillDeps').selectedOptions).map(o=>o.value).filter(v=>v!==id);
+        const payload = {
+          id,
+          name:el.querySelector('#skillName').value.trim(),
+          path:el.querySelector('#skillPath').value,
+          level:el.querySelector('#skillLevel').value,
+          estHours:Math.max(1,Number(el.querySelector('#skillHours').value||1)),
+          status:el.querySelector('#skillStatus').value,
+          goal:el.querySelector('#skillGoal').value.trim(),
+          targetDate:el.querySelector('#skillTarget').value,
+          notes:el.querySelector('#skillNotes').value,
+          deps,
+          resources:[],
+          order:999,
+          isCustom:true
+        };
+        if(!payload.name) return toast('Skill name is required.');
+        const idx = state.skills.findIndex(s=>s.id===id);
+        if(idx>=0) state.skills[idx] = {...state.skills[idx],...payload,isCustom:state.skills[idx].isCustom || !seedSkills.some(k=>k.id===id)};
+        else state.skills.push(payload);
+        persist();
+        clear();
+      };
+
+      const redraw = () => {
+        const q = el.querySelector('#skillSearch').value.trim().toLowerCase();
+        const pf = el.querySelector('#skillPathFilter').value;
+        const st = el.querySelector('#skillStatusFilter').value;
+        const list = state.skills
+          .filter(s => (!q || `${s.name} ${s.path} ${s.notes}`.toLowerCase().includes(q)) && (pf==='All'||s.path===pf) && (st==='All'||s.status===st))
+          .sort((a,b)=>a.path.localeCompare(b.path)||a.order-b.order||a.name.localeCompare(b.name));
+
+        const holder = el.querySelector('#skillCards');
+        if(!list.length){
+          holder.innerHTML = `<div class="surface flat"><strong>No skills in this view.</strong><div class="tiny muted">Adjust filters or add a custom skill above.</div><button class="btn" type="button" onclick="window.__go('skills')">Add Skill</button></div>`;
+          return;
+        }
+
+        holder.innerHTML = list.map(s => `<article class="skill-card">
+          <div style="display:flex;justify-content:space-between;gap:.5rem;align-items:flex-start;flex-wrap:wrap">
+            <div><strong>${esc(s.name)}</strong> ${s.isCustom?'<span class="pill">Custom</span>':''}<div class="tiny muted">${esc(s.path)} • ${esc(s.level)} • ~${s.estHours}h</div></div>
+            <span class="pill ${learningStatusClass(s.status)}">${s.status}</span>
+          </div>
+          <div class="tiny muted" style="margin-top:.35rem">Dependencies: ${(s.deps||[]).map(d=>esc(skillById(d)?.name||d)).join(', ') || 'None'}</div>
+          <div class="tiny muted">Goal: ${esc(s.goal||'—')} • Last studied: ${esc(s.lastStudiedDate||'—')}</div>
+          <div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.6rem">
+            <button class="btn" data-edit-skill="${s.id}" type="button">Edit</button>
+            <button class="btn" data-open-skill="${s.id}" type="button">Open Detail</button>
+            ${s.isCustom ? `<button class="btn warn" data-del-skill="${s.id}" type="button">Delete</button>` : ''}
+          </div>
+        </article>`).join('');
+
+        holder.querySelectorAll('[data-edit-skill]').forEach(btn => btn.onclick = () => {
+          const s = skillById(btn.dataset.editSkill);
+          if(!s) return;
+          el.querySelector('#skillId').value = s.id;
+          el.querySelector('#skillName').value = s.name;
+          el.querySelector('#skillPath').value = s.path;
+          el.querySelector('#skillLevel').value = s.level;
+          el.querySelector('#skillHours').value = s.estHours;
+          el.querySelector('#skillStatus').value = s.status;
+          el.querySelector('#skillGoal').value = s.goal||'';
+          el.querySelector('#skillTarget').value = s.targetDate||'';
+          el.querySelector('#skillNotes').value = s.notes||'';
+          Array.from(el.querySelector('#skillDeps').options).forEach(opt => opt.selected = (s.deps||[]).includes(opt.value));
+          toast('Skill loaded for editing.');
+        });
+
+        holder.querySelectorAll('[data-open-skill]').forEach(btn => btn.onclick = () => openSkillDrawer(btn.dataset.openSkill));
+
+        holder.querySelectorAll('[data-del-skill]').forEach(btn => btn.onclick = () => {
+          if(!confirm('Delete this custom skill?')) return;
+          const id = btn.dataset.delSkill;
+          state.skills = state.skills.filter(s=>s.id!==id);
+          state.resources = state.resources.map(r => r.skillId===id ? {...r,skillId:''} : r);
+          persist();
+        });
+      };
+
+      ['skillSearch','skillPathFilter','skillStatusFilter'].forEach(id=>{
+        el.querySelector('#'+id).oninput = redraw;
+        el.querySelector('#'+id).onchange = redraw;
+      });
+      redraw();
+    }
+
+    function weeklyBarsData(){
+      const arr = [];
+      for(let w=7;w>=0;w--){
+        let sum = 0;
+        for(let i=0;i<7;i++){
+          const day = shiftDate(isoDate(new Date()),-(w*7+i));
+          sum += Number(state.activity[day]?.hours||0);
+        }
+        arr.push(sum);
+      }
+      return arr;
+    }
+
+    function renderActivity(){
+      const el = document.getElementById('activitySection');
+      const today = isoDate(new Date());
+      const streak = streakInfo();
+      const weekly = weeklyComparison();
+      const weeklyGoalPct = Math.min(100, Math.round((weekly.thisWeek/Math.max(1,Number(state.settings.weeklyHoursTarget||10)))*100));
+      const bars = weeklyBarsData();
+      const max = Math.max(1,...bars);
+
+      el.innerHTML = `
+        <div class="grid g3">
+          <div class="surface ${todayActivityDone()?'celebrate':''}">
+            <div class="tiny muted">Current streak</div>
+            <div class="metric" style="font-size:2.4rem" data-count="${streak.current}">${streak.current}</div>
+            <div class="tiny muted">Longest streak: ${streak.longest} days</div>
+            <div style="margin-top:.45rem" class="progress-track"><span style="width:${Math.min(100,Math.round((streak.current/Math.max(1,Number(state.settings.streakTarget||7)))*100))}%"></span></div>
+            <div class="tiny muted" style="margin-top:.35rem">Weekly streak goal: ${Number(state.settings.streakTarget||7)} days</div>
+          </div>
+          <div class="surface"><div class="tiny muted">Consistency</div><div class="metric" data-count="${consistencyPercent()}">${consistencyPercent()}</div><div class="metric-sub">% active days</div><div class="tiny muted" style="margin-top:.4rem">Total active days: ${streak.activeDays}</div></div>
+          <div class="surface"><div class="tiny muted">Weekly activity</div><div class="metric">${weekly.thisWeek.toFixed(1)}h</div><div class="metric-sub">${weekly.delta>=0?'+':''}${weekly.delta.toFixed(1)}h vs previous week</div><div class="tiny muted" style="margin-top:.4rem">Best day: ${streak.bestDay?`${streak.bestDay.date} (${streak.bestDay.hours}h)`:'No activity yet'}</div></div>
+        </div>
+
+        <div class="grid g2" style="margin-top:.8rem">
+          <div class="surface">
+            <h4>Log Learning Activity</h4>
+            <form id="activityForm">
+              <div class="grid g3">
+                <div class="field"><label>Date</label><input id="actDate" type="date" value="${today}" required /></div>
+                <div class="field"><label>Hours</label><input id="actHours" type="number" step="0.25" min="0" value="1" required /></div>
+                <div class="field"><label>Skill</label><select id="actSkill"><option value="">General</option>${state.skills.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></div>
+              </div>
+              <div class="grid g2" style="margin-top:.55rem">
+                <div class="field"><label>Topic</label><input id="actTopic" placeholder="e.g. SQL Joins" /></div>
+                <div class="field"><label>Notes</label><input id="actNote" placeholder="What did you learn?" /></div>
+              </div>
+              <div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.7rem"><button class="btn primary" type="submit">Save Activity</button><button class="btn" id="actDelete" type="button">Delete Day Entry</button></div>
+            </form>
+            <div class="surface flat" style="margin-top:.7rem"><strong>Weekly goal</strong><div class="tiny muted">${weekly.thisWeek.toFixed(1)} / ${Number(state.settings.weeklyHoursTarget||10)} hours</div><div style="margin-top:.4rem" class="progress-track"><span style="width:${weeklyGoalPct}%"></span></div></div>
+          </div>
+
+          <div class="surface">
+            <h4>Streak Calendar & Heatmap</h4>
+            <div id="heatmap" class="heatmap"></div>
+            <div class="tiny muted">Dark = none, brighter = more learning hours for the day.</div>
+            <h4 style="margin-top:.8rem">Weekly trend (last 8 weeks)</h4>
+            <div class="chart">${bars.map((v,idx)=>`<div class="bar"><div class="fill" style="height:${Math.max(4,Math.round((v/max)*120))}px"></div><small>W${idx+1}</small></div>`).join('')}</div>
+          </div>
+        </div>
+
+        <div class="grid g2" style="margin-top:.8rem">
+          <div class="surface">
+            <h4>Recent activity</h4>
+            ${renderActivityListMarkup(12,false)}
+          </div>
+          <div class="surface">
+            <h4>Milestones & Achievements</h4>
+            <div class="ach-list">${achievements().map(a => `<div class="ach ${a.done?'done':''}"><span>${a.title}</span><strong>${a.done?'Unlocked':'In Progress'}</strong></div>`).join('')}</div>
+            <div class="tiny muted" style="margin-top:.55rem">Milestones are based only on your actual saved activity and progress.</div>
+          </div>
+        </div>
+      `;
+
+      const form = el.querySelector('#activityForm');
+      form.onsubmit = (ev) => {
+        ev.preventDefault();
+        const date = el.querySelector('#actDate').value;
+        const hours = Number(el.querySelector('#actHours').value||0);
+        const skillId = el.querySelector('#actSkill').value;
+        const topic = el.querySelector('#actTopic').value.trim();
+        const note = el.querySelector('#actNote').value.trim();
+        if(!date) return toast('Date is required.');
+        if(hours < 0) return toast('Hours cannot be negative.');
+        state.activity[date] = {hours,skillId,topic,note};
+        if(skillId && skillById(skillId)) skillById(skillId).lastStudiedDate = date;
+        persist();
+        if(date===isoDate(new Date()) && hours>0) toast('Today logged — streak updated.');
+      };
+
+      el.querySelector('#actDelete').onclick = () => {
+        const date = el.querySelector('#actDate').value;
+        if(!date || !state.activity[date]) return toast('No entry for selected date.');
+        delete state.activity[date];
+        persist();
+      };
+
+      renderHeatmap(el.querySelector('#heatmap'));
+      animateCounters(el);
+    }
+
+    function renderHeatmap(container){
+      const days = 182;
+      const start = new Date();
+      start.setDate(start.getDate()-(days-1));
+      container.innerHTML = '';
+      for(let i=0;i<days;i++){
+        const d = new Date(start); d.setDate(start.getDate()+i);
+        const key = isoDate(d);
+        const h = Number(state.activity[key]?.hours||0);
+        const lvl = h===0?0:h<1?1:h<2?2:h<4?3:4;
+        const c = document.createElement('div');
+        c.className = `cell ${lvl?`l${lvl}`:''}`;
+        c.title = `${key}: ${h}h`;
+        container.appendChild(c);
+      }
+    }
+
+    function renderGoals(){
+      const el = document.getElementById('goalsSection');
+      el.innerHTML = `
+        <div class="grid g2">
+          <div class="surface">
+            <h3>Goals & Notes</h3>
+            <div class="field"><label>Career goal</label><input id="careerGoalInput" value="${esc(state.settings.careerGoal||'')}" placeholder="e.g. Become interview-ready Data Analyst in 4 months" /></div>
+            <div class="field" style="margin-top:.6rem"><label>Learning goals</label><textarea id="globalGoals">${esc(state.goals||'')}</textarea></div>
+            <div class="field" style="margin-top:.6rem"><label>Notes</label><textarea id="globalNotes">${esc(state.notes||'')}</textarea></div>
+            <div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.65rem"><button class="btn primary" id="saveNotesBtn" type="button">Save Goals & Notes</button></div>
+          </div>
+
+          <div class="surface">
+            <h3>Profile & Preferences</h3>
+            <div class="grid g2">
+              <div class="field"><label>Name</label><input id="setName" value="${esc(state.settings.name||'Learner')}" /></div>
+              <div class="field"><label>Primary career path</label><select id="setPrimaryPath">${Object.keys(PATHS).map(p=>`<option ${p===state.settings.primaryPath?'selected':''}>${esc(p)}</option>`).join('')}</select></div>
+              <div class="field"><label>Weekly hours target</label><input id="setWeeklyHours" type="number" min="1" value="${Number(state.settings.weeklyHoursTarget||10)}" /></div>
+              <div class="field"><label>Weekly skills target</label><input id="setWeeklySkills" type="number" min="1" value="${Number(state.settings.weeklySkillsTarget||2)}" /></div>
+              <div class="field"><label>Streak target (days)</label><input id="setStreakTarget" type="number" min="1" value="${Number(state.settings.streakTarget||7)}" /></div>
+              <div class="field"><label>Daily hours target</label><input id="setDailyTarget" type="number" min="0.25" step="0.25" value="${Number(state.settings.dailyHoursTarget||1)}" /></div>
+              <div class="field"><label>Preferred learning time</label><input id="setPreferredHours" value="${esc(state.settings.preferredHours||'')}" /></div>
+              <div class="field"><label>Start date</label><input id="setStartDate" type="date" value="${esc(state.settings.startDate||isoDate(new Date()))}" /></div>
+            </div>
+            <div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.7rem"><button class="btn primary" id="saveSettingsBtn" type="button">Save Settings</button></div>
+          </div>
+        </div>
+
+        <div class="surface" style="margin-top:.8rem">
+          <h3>Backup & Data Controls</h3>
+          <div class="muted tiny">Export/import JSON to preserve your learning history. Reset restores seed roadmap and clears personal progress.</div>
+          <div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.7rem">
+            <button class="btn" id="exportBtn" type="button">Export JSON</button>
+            <label class="btn" style="cursor:pointer">Import JSON<input id="importInput" type="file" accept="application/json" style="display:none"></label>
+            <button class="btn warn" id="resetBtn" type="button">Reset to Demo Data</button>
+          </div>
+        </div>
+      `;
+
+      el.querySelector('#saveNotesBtn').onclick = () => {
+        state.settings.careerGoal = el.querySelector('#careerGoalInput').value.trim();
+        state.goals = el.querySelector('#globalGoals').value;
+        state.notes = el.querySelector('#globalNotes').value;
+        persist();
+        toast('Goals and notes saved.');
+      };
+
+      el.querySelector('#saveSettingsBtn').onclick = () => {
+        state.settings.name = el.querySelector('#setName').value.trim() || 'Learner';
+        state.settings.primaryPath = el.querySelector('#setPrimaryPath').value;
+        state.settings.weeklyHoursTarget = Math.max(1,Number(el.querySelector('#setWeeklyHours').value||10));
+        state.settings.weeklySkillsTarget = Math.max(1,Number(el.querySelector('#setWeeklySkills').value||2));
+        state.settings.streakTarget = Math.max(1,Number(el.querySelector('#setStreakTarget').value||7));
+        state.settings.dailyHoursTarget = Math.max(0.25,Number(el.querySelector('#setDailyTarget').value||1));
+        state.settings.preferredHours = el.querySelector('#setPreferredHours').value.trim();
+        state.settings.startDate = el.querySelector('#setStartDate').value || isoDate(new Date());
+        state.selectedPath = state.settings.primaryPath;
+        persist();
+        toast('Settings saved.');
+      };
+
+      el.querySelector('#exportBtn').onclick = () => {
+        const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data-career-dashboard-backup.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      el.querySelector('#importInput').onchange = (ev) => {
+        const file = ev.target.files?.[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            state = mergeState(JSON.parse(String(reader.result||'{}')));
+            persist(false);
+            toast('Import successful.');
+          } catch { toast('Invalid JSON file.'); }
+        };
+        reader.readAsText(file);
+      };
+
+      el.querySelector('#resetBtn').onclick = () => {
+        if(!confirm('Reset all data to demo defaults?')) return;
+        state = defaultState();
+        persist(false);
+        toast('Reset to demo data complete.');
+      };
+    }
+
+    function renderPalette(){
+      const input = document.getElementById('paletteInput');
+      const q = input.value.trim().toLowerCase();
+      const results = [];
+      for(const s of state.skills){
+        if(!q || `${s.name} ${s.path} ${s.notes} ${s.goal}`.toLowerCase().includes(q)) results.push({type:'Skill',title:s.name,subtitle:`${s.path} • ${s.status}`,action:()=>{showSection('roadmap');openSkillDrawer(s.id);}});
+      }
+      for(const r of state.resources){
+        if(!q || `${r.name} ${r.path} ${r.category} ${r.notes}`.toLowerCase().includes(q)) results.push({type:'Resource',title:r.name,subtitle:`${r.path} • ${r.status}`,action:()=>showSection('resources')});
+      }
+      for(const p of Object.keys(PATHS)){
+        if(!q || p.toLowerCase().includes(q) || PATHS[p].desc.toLowerCase().includes(q)) results.push({type:'Career Path',title:p,subtitle:PATHS[p].desc,action:()=>{state.selectedPath=p;showSection('career');renderCareerPaths();}});
+      }
+      if(!q || state.notes.toLowerCase().includes(q) || state.goals.toLowerCase().includes(q)){
+        results.push({type:'Notes',title:'Goals & Notes',subtitle:'Open personal goals and reflections',action:()=>showSection('goals')});
+      }
+
+      const holder = document.getElementById('paletteResults');
+      if(!results.length){
+        holder.innerHTML = `<div class="surface flat"><strong>No matches yet.</strong><div class="tiny muted">Try searching SQL, streak, Data Engineer, or resources.</div></div>`;
+        return;
+      }
+      holder.innerHTML = results.slice(0,30).map((r,i)=>`<button class="result-item" data-result="${i}" type="button"><div class="pill">${r.type}</div><strong>${esc(r.title)}</strong><div class="tiny muted">${esc(r.subtitle)}</div></button>`).join('');
+      holder.querySelectorAll('[data-result]').forEach(btn => btn.onclick = () => { const r = results[Number(btn.dataset.result)]; r.action(); closePalette(); });
+      document.getElementById('palette').dataset.firstResult = String(results.length?0:-1);
+      document.getElementById('palette')._results = results;
+    }
+
+    function openPalette(){
+      ui.paletteOpen = true;
+      const p = document.getElementById('palette');
+      p.classList.add('open');
+      p.setAttribute('aria-hidden','false');
+      const input = document.getElementById('paletteInput');
+      input.value='';
+      renderPalette();
+      setTimeout(()=>input.focus(),20);
+    }
+
+    function closePalette(){
+      ui.paletteOpen = false;
+      const p = document.getElementById('palette');
+      p.classList.remove('open');
+      p.setAttribute('aria-hidden','true');
+    }
+
+    function animateCounters(root=document){
+      root.querySelectorAll('[data-count]').forEach(el => {
+        const target = Number(el.dataset.count);
+        if(!Number.isFinite(target)) return;
+        const decimals = String(el.dataset.count).includes('.') ? 1 : 0;
+        const start = 0;
+        const t0 = performance.now();
+        const duration = 500;
+        const step = (t) => {
+          const p = Math.min(1,(t-t0)/duration);
+          const v = start + (target-start)*p;
+          el.textContent = decimals ? v.toFixed(decimals) : String(Math.round(v));
+          if(p<1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    }
+
+    function bindGlobalEvents(){
+      document.getElementById('drawerClose').onclick = closeSkillDrawer;
+      document.getElementById('skillDrawer').addEventListener('click',(e)=>{ if(e.target.id==='skillDrawer') closeSkillDrawer(); });
+      document.getElementById('searchBtn').onclick = openPalette;
+      document.getElementById('palette').addEventListener('click',(e)=>{ if(e.target.id==='palette') closePalette(); });
+      document.getElementById('paletteInput').oninput = renderPalette;
+
+      document.addEventListener('keydown',(e)=>{
+        if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==='k'){
+          e.preventDefault();
+          ui.paletteOpen ? closePalette() : openPalette();
+        }
+        if(e.key==='Escape'){
+          if(ui.paletteOpen) closePalette();
+          const drawer = document.getElementById('skillDrawer');
+          if(drawer.classList.contains('open')) closeSkillDrawer();
+        }
+        if(e.key==='Enter' && ui.paletteOpen){
+          const results = document.getElementById('palette')._results || [];
+          if(results.length){
+            results[0].action();
+            closePalette();
+          }
+        }
+      });
+
+      window.__go = (id) => showSection(id);
+    }
+
+    function renderAll(){
+      renderStorageNotice();
+      renderTopProfile();
+      renderNav();
+      renderDashboard();
+      renderCareerPaths();
+      renderRoadmap();
+      renderProgress();
+      renderResources();
+      renderSkills();
+      renderActivity();
+      renderGoals();
+      showSection(ui.section || 'dashboard');
+    }
+
+    bindGlobalEvents();
+    renderAll();
+  </script>
+</body>
+</html>

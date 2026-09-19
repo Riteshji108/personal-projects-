@@ -1,0 +1,1831 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pathwise — Data Career Learning Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#f3f5f9; --bg-2:#eceff5; --surface:#ffffff; --surface-2:#f7f8fb;
+  --border:#dde2ec; --border-soft:#e7eaf2;
+  --text:#141922; --text-dim:#5b6577; --text-faint:#8892a3;
+  --accent:#0f9488; --accent-soft:#0f948820;
+  --amber:#b45309; --amber-soft:#b4530920;
+  --violet:#6d5bd0; --violet-soft:#6d5bd020;
+  --rose:#c33d75; --rose-soft:#c33d7520;
+  --blue:#2f6fce; --blue-soft:#2f6fce20;
+  --danger:#c2453f; --danger-soft:#c2453f1a;
+  --shadow: 0 1px 2px rgba(20,25,34,.04), 0 8px 24px rgba(20,25,34,.06);
+  --radius-s:8px; --radius-m:12px; --radius-l:18px;
+  --font-display:'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --font-body:'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono:'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a0e14; --bg-2:#0d1219; --surface:#111826; --surface-2:#0d131d;
+    --border:#232b3a; --border-soft:#1a212e;
+    --text:#e9edf5; --text-dim:#9aa4b8; --text-faint:#6b7688;
+    --accent:#39d6c4; --accent-soft:#39d6c422;
+    --amber:#f0a83c; --amber-soft:#f0a83c22;
+    --violet:#a793ff; --violet-soft:#a793ff22;
+    --rose:#f27fac; --rose-soft:#f27fac22;
+    --blue:#5b9bff; --blue-soft:#5b9bff22;
+    --danger:#f16b64; --danger-soft:#f16b6422;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a0e14; --bg-2:#0d1219; --surface:#111826; --surface-2:#0d131d;
+  --border:#232b3a; --border-soft:#1a212e;
+  --text:#e9edf5; --text-dim:#9aa4b8; --text-faint:#6b7688;
+  --accent:#39d6c4; --accent-soft:#39d6c422;
+  --amber:#f0a83c; --amber-soft:#f0a83c22;
+  --violet:#a793ff; --violet-soft:#a793ff22;
+  --rose:#f27fac; --rose-soft:#f27fac22;
+  --blue:#5b9bff; --blue-soft:#5b9bff22;
+  --danger:#f16b64; --danger-soft:#f16b6422;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px rgba(0,0,0,.35);
+}
+:root[data-theme="light"]{
+  --bg:#f3f5f9; --bg-2:#eceff5; --surface:#ffffff; --surface-2:#f7f8fb;
+  --border:#dde2ec; --border-soft:#e7eaf2;
+  --text:#141922; --text-dim:#5b6577; --text-faint:#8892a3;
+  --accent:#0f9488; --accent-soft:#0f948820;
+  --amber:#b45309; --amber-soft:#b4530920;
+  --violet:#6d5bd0; --violet-soft:#6d5bd020;
+  --rose:#c33d75; --rose-soft:#c33d7520;
+  --blue:#2f6fce; --blue-soft:#2f6fce20;
+  --danger:#c2453f; --danger-soft:#c2453f1a;
+  --shadow: 0 1px 2px rgba(20,25,34,.04), 0 8px 24px rgba(20,25,34,.06);
+}
+
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; background:
+    radial-gradient(1200px 600px at 100% -10%, var(--accent-soft), transparent 60%),
+    var(--bg);
+  color:var(--text); font-family:var(--font-body); -webkit-font-smoothing:antialiased;
+  transition:background .3s ease,color .3s ease;
+}
+::selection{ background:var(--accent-soft); }
+a{ color:var(--accent); text-decoration:none; }
+a:hover{ text-decoration:underline; }
+h1,h2,h3,h4{ font-family:var(--font-display); margin:0; letter-spacing:-0.01em; }
+button{ font:inherit; }
+:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }
+.mono{ font-family:var(--font-mono); }
+.hidden{ display:none !important; }
+.sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
+
+/* ============ APP SHELL ============ */
+.app{ display:flex; min-height:100vh; }
+
+.sidebar{
+  width:236px; flex-shrink:0; background:var(--surface); border-right:1px solid var(--border);
+  display:flex; flex-direction:column; padding:1.1rem .8rem; position:sticky; top:0; height:100vh;
+}
+.brand{ display:flex; align-items:center; gap:.55rem; padding:.3rem .5rem 1.1rem; }
+.brand-mark{ width:30px; height:30px; border-radius:9px; background:linear-gradient(145deg,var(--accent),var(--blue)); display:flex; align-items:center; justify-content:center; color:#06110f; font-family:var(--font-display); font-weight:700; font-size:.95rem; flex-shrink:0; }
+.brand-name{ font-family:var(--font-display); font-weight:700; font-size:1.02rem; }
+.brand-sub{ font-size:.68rem; color:var(--text-faint); margin-top:-2px; }
+
+.navlist{ display:flex; flex-direction:column; gap:.15rem; margin-top:.3rem; }
+.navlist button{
+  display:flex; align-items:center; gap:.65rem; text-align:left; background:none; border:none;
+  color:var(--text-dim); padding:.55rem .6rem; border-radius:var(--radius-s); cursor:pointer; font-size:.88rem;
+  transition:background .15s ease, color .15s ease;
+}
+.navlist button svg{ width:17px; height:17px; flex-shrink:0; opacity:.85; }
+.navlist button:hover{ background:var(--surface-2); color:var(--text); }
+.navlist button.active{ background:var(--accent-soft); color:var(--accent); font-weight:600; }
+.navlist button.active svg{ opacity:1; }
+
+.sidebar-foot{ margin-top:auto; display:flex; flex-direction:column; gap:.4rem; }
+.streak-chip{
+  display:flex; align-items:center; gap:.5rem; padding:.55rem .65rem; border-radius:var(--radius-s);
+  background:var(--amber-soft); border:1px solid transparent; color:var(--amber); font-size:.82rem; font-weight:600;
+}
+.settings-btn{
+  display:flex; align-items:center; gap:.6rem; padding:.5rem .6rem; border-radius:var(--radius-s);
+  background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:.85rem;
+}
+.settings-btn:hover{ background:var(--surface-2); color:var(--text); }
+.settings-btn svg{ width:16px; height:16px; }
+
+.topbar{
+  position:sticky; top:0; z-index:40; display:flex; align-items:center; justify-content:space-between;
+  gap:.8rem; padding:.85rem 1.4rem; background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--border-soft);
+}
+.topbar-title{ font-family:var(--font-display); font-weight:600; font-size:1.05rem; }
+.topbar-actions{ display:flex; align-items:center; gap:.5rem; }
+.search-trigger{
+  display:flex; align-items:center; gap:.5rem; background:var(--surface); border:1px solid var(--border);
+  color:var(--text-faint); padding:.42rem .6rem .42rem .55rem; border-radius:999px; cursor:pointer; font-size:.82rem;
+}
+.search-trigger kbd{ font-family:var(--font-mono); font-size:.68rem; background:var(--surface-2); border:1px solid var(--border); padding:.05rem .32rem; border-radius:5px; color:var(--text-faint); }
+.icon-btn{
+  display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:999px;
+  background:var(--surface); border:1px solid var(--border); color:var(--text-dim); cursor:pointer;
+}
+.icon-btn:hover{ color:var(--text); border-color:var(--text-faint); }
+.icon-btn svg{ width:16px; height:16px; }
+
+.mobile-topbar{ display:none; }
+
+main.content{ flex:1; min-width:0; padding:1.3rem 1.4rem 5rem; max-width:1180px; margin:0 auto; width:100%; }
+.page{ display:flex; flex-direction:column; gap:1.3rem; }
+.page-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+.page-head h1{ font-size:1.5rem; }
+.page-head p{ margin:.2rem 0 0; color:var(--text-dim); font-size:.9rem; max-width:60ch; }
+.eyebrow{ font-size:.72rem; color:var(--text-faint); margin-bottom:.15rem; }
+
+/* ============ PRIMITIVES ============ */
+.panel{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-m); padding:1.1rem; box-shadow:var(--shadow); }
+.panel-tight{ padding:.85rem; }
+.grid{ display:grid; gap:1rem; }
+.g2{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+.g3{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+.g4{ grid-template-columns:repeat(4,minmax(0,1fr)); }
+@media (max-width:980px){ .g4{ grid-template-columns:repeat(2,minmax(0,1fr)); } .g3{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:640px){ .g4,.g3,.g2{ grid-template-columns:1fr; } }
+
+.btn{
+  display:inline-flex; align-items:center; gap:.4rem; justify-content:center; padding:.5rem .85rem;
+  border-radius:var(--radius-s); border:1px solid var(--border); background:var(--surface-2); color:var(--text);
+  cursor:pointer; font-size:.85rem; font-weight:500; transition:transform .1s ease, border-color .15s ease, background .15s ease;
+}
+.btn:hover{ border-color:var(--text-faint); }
+.btn:active{ transform:scale(.97); }
+.btn-primary{ background:var(--accent); border-color:transparent; color:#062420; font-weight:600; }
+:root[data-theme="light"] .btn-primary, :root:not([data-theme="dark"]) .btn-primary{ color:#022; }
+.btn-primary:hover{ filter:brightness(1.06); border-color:transparent; }
+.btn-ghost{ background:none; border-color:transparent; color:var(--text-dim); }
+.btn-ghost:hover{ background:var(--surface-2); color:var(--text); }
+.btn-danger{ color:var(--danger); }
+.btn-sm{ padding:.32rem .6rem; font-size:.78rem; }
+.btn svg{ width:14px; height:14px; }
+
+label{ font-size:.78rem; color:var(--text-dim); display:block; margin-bottom:.28rem; }
+input,select,textarea{
+  width:100%; font:inherit; background:var(--surface-2); color:var(--text); border:1px solid var(--border);
+  border-radius:var(--radius-s); padding:.5rem .6rem; font-size:.86rem; transition:border-color .15s ease;
+}
+input:focus,select:focus,textarea:focus{ border-color:var(--accent); }
+textarea{ min-height:70px; resize:vertical; font-family:inherit; }
+.field{ display:flex; flex-direction:column; }
+
+.tag{ display:inline-flex; align-items:center; gap:.3rem; font-size:.7rem; font-weight:600; padding:.18rem .5rem; border-radius:999px; }
+.tag-accent{ background:var(--accent-soft); color:var(--accent); }
+.tag-amber{ background:var(--amber-soft); color:var(--amber); }
+.tag-violet{ background:var(--violet-soft); color:var(--violet); }
+.tag-rose{ background:var(--rose-soft); color:var(--rose); }
+.tag-blue{ background:var(--blue-soft); color:var(--blue); }
+.tag-muted{ background:var(--surface-2); color:var(--text-faint); border:1px solid var(--border); }
+
+.divider{ height:1px; background:var(--border-soft); border:none; margin:0; }
+
+.progress-track{ height:8px; border-radius:999px; background:var(--surface-2); border:1px solid var(--border-soft); overflow:hidden; }
+.progress-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg, var(--accent), var(--blue)); transition:width .5s cubic-bezier(.4,0,.2,1); }
+.progress-fill.amber{ background:linear-gradient(90deg, var(--amber), #f4c76b); }
+
+.toast-stack{ position:fixed; right:1rem; bottom:1rem; z-index:400; display:flex; flex-direction:column; gap:.5rem; align-items:flex-end; }
+.toast{
+  background:var(--surface); border:1px solid var(--border); color:var(--text); padding:.6rem .85rem; border-radius:var(--radius-s);
+  box-shadow:var(--shadow); font-size:.84rem; max-width:300px; animation:toastIn .22s ease;
+}
+@keyframes toastIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+
+.empty{
+  border:1px dashed var(--border); border-radius:var(--radius-m); padding:1.6rem 1.2rem; text-align:center;
+  color:var(--text-dim); background:var(--surface-2);
+}
+.empty h4{ color:var(--text); font-size:.95rem; margin-bottom:.3rem; }
+.empty p{ font-size:.83rem; margin:0 0 .7rem; }
+
+/* ============ OVERVIEW ============ */
+.hero-grid{ display:grid; grid-template-columns:1.15fr 1fr; gap:1rem; }
+@media (max-width:900px){ .hero-grid{ grid-template-columns:1fr; } }
+
+.hero-card{
+  background:radial-gradient(600px 260px at 10% 0%, var(--accent-soft), transparent 60%), var(--surface);
+  border:1px solid var(--border); border-radius:var(--radius-l); padding:1.3rem; box-shadow:var(--shadow);
+  display:flex; gap:1.2rem; align-items:center; flex-wrap:wrap;
+}
+.ring-wrap{ position:relative; width:132px; height:132px; flex-shrink:0; }
+.ring-wrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+.ring-bg{ fill:none; stroke:var(--border-soft); stroke-width:10; }
+.ring-fg{ fill:none; stroke:url(#ringGrad); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset .7s cubic-bezier(.4,0,.2,1); }
+.ring-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring-center .num{ font-family:var(--font-display); font-size:1.5rem; font-weight:700; }
+.ring-center .lbl{ font-size:.65rem; color:var(--text-faint); text-transform:none; }
+
+.hero-copy{ flex:1; min-width:180px; }
+.hero-copy .eyebrow{ margin-bottom:.15rem; }
+.hero-copy h2{ font-size:1.25rem; margin-bottom:.35rem; }
+.hero-copy p{ color:var(--text-dim); font-size:.86rem; margin:0; }
+.hero-stats{ display:flex; gap:1.4rem; margin-top:.85rem; flex-wrap:wrap; }
+.hero-stat b{ display:block; font-family:var(--font-display); font-size:1.05rem; }
+.hero-stat span{ font-size:.72rem; color:var(--text-faint); }
+
+.streak-card{
+  border-radius:var(--radius-l); border:1px solid var(--border); padding:1.3rem;
+  background:radial-gradient(500px 220px at 90% 0%, var(--amber-soft), transparent 60%), var(--surface);
+  box-shadow:var(--shadow); display:flex; flex-direction:column; justify-content:space-between; gap:.8rem;
+}
+.streak-top{ display:flex; align-items:center; justify-content:space-between; }
+.streak-num{ font-family:var(--font-display); font-size:2.6rem; font-weight:700; color:var(--amber); line-height:1; transition:transform .25s ease; }
+.streak-num.pulse{ animation:streakPulse .55s ease; }
+@keyframes streakPulse{ 0%{ transform:scale(1);} 35%{ transform:scale(1.14);} 100%{ transform:scale(1);} }
+.streak-flame{ width:34px; height:34px; color:var(--amber); }
+.streak-note{ font-size:.82rem; color:var(--text-dim); }
+.streak-meta{ display:flex; gap:1.1rem; font-size:.76rem; color:var(--text-faint); }
+.streak-meta b{ color:var(--text); font-family:var(--font-mono); }
+
+.continue-card{
+  display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;
+  border-radius:var(--radius-l); border:1px solid var(--border); padding:1.1rem 1.3rem; box-shadow:var(--shadow);
+  background:var(--surface);
+}
+.continue-info .eyebrow{ color:var(--accent); }
+.continue-info h3{ font-size:1.15rem; margin:.15rem 0 .3rem; }
+.continue-info .meta{ font-size:.8rem; color:var(--text-dim); display:flex; gap:.8rem; flex-wrap:wrap; }
+.continue-bar{ width:220px; }
+@media (max-width:640px){ .continue-bar{ width:100%; } }
+
+.section-title{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.1rem; }
+.section-title h3{ font-size:1.02rem; }
+.section-title a,.section-title button.link{ font-size:.8rem; color:var(--accent); background:none; border:none; cursor:pointer; }
+
+.path-compare{ display:flex; flex-direction:column; gap:.7rem; }
+.path-compare-row{ display:grid; grid-template-columns:130px 1fr 42px; align-items:center; gap:.7rem; }
+.path-compare-row .pname{ font-size:.82rem; font-weight:600; }
+.path-compare-row .pval{ font-size:.78rem; color:var(--text-faint); text-align:right; font-family:var(--font-mono); }
+
+.mini-bars{ display:flex; align-items:flex-end; gap:6px; height:70px; }
+.mini-bars .bar{ flex:1; background:var(--surface-2); border:1px solid var(--border-soft); border-radius:4px 4px 2px 2px; position:relative; min-height:3px; }
+.mini-bars .bar > span{ position:absolute; bottom:0; left:0; right:0; border-radius:4px 4px 2px 2px; background:linear-gradient(180deg, var(--accent), var(--blue)); }
+.mini-bars .lbl{ font-size:.62rem; color:var(--text-faint); text-align:center; margin-top:.3rem; }
+
+.milestone-strip{ display:flex; gap:.6rem; overflow-x:auto; padding-bottom:.2rem; }
+.milestone-chip{
+  flex:0 0 auto; display:flex; align-items:center; gap:.5rem; padding:.5rem .75rem; border-radius:999px;
+  border:1px solid var(--border); background:var(--surface-2); font-size:.78rem; color:var(--text-faint);
+}
+.milestone-chip.done{ border-color:transparent; background:var(--accent-soft); color:var(--accent); }
+.milestone-chip svg{ width:14px; height:14px; }
+
+.activity-feed{ display:flex; flex-direction:column; }
+.activity-row{ display:flex; gap:.7rem; padding:.55rem 0; border-bottom:1px solid var(--border-soft); font-size:.83rem; }
+.activity-row:last-child{ border-bottom:none; }
+.activity-dot{ width:8px; height:8px; border-radius:999px; background:var(--accent); margin-top:.35rem; flex-shrink:0; }
+.activity-row .d{ color:var(--text-faint); font-size:.74rem; font-family:var(--font-mono); min-width:74px; }
+.activity-row .t{ color:var(--text); }
+.activity-row .s{ color:var(--text-faint); }
+
+/* ============ CAREER PATHS ============ */
+.path-card{ border-radius:var(--radius-l); border:1px solid var(--border); background:var(--surface); box-shadow:var(--shadow); padding:1.1rem; display:flex; flex-direction:column; gap:.7rem; position:relative; overflow:hidden; }
+.path-card::before{ content:''; position:absolute; inset:0 0 auto 0; height:3px; background:var(--pathColor,var(--accent)); }
+.path-card-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:.6rem; }
+.path-card h3{ font-size:1.08rem; }
+.path-card .desc{ font-size:.83rem; color:var(--text-dim); }
+.path-ring-row{ display:flex; align-items:center; gap:.9rem; }
+.path-mini-ring{ width:54px; height:54px; flex-shrink:0; }
+.path-facts{ display:flex; gap:1rem; flex-wrap:wrap; font-size:.76rem; color:var(--text-faint); }
+.path-facts b{ color:var(--text); font-family:var(--font-mono); font-weight:500; }
+.tool-row{ display:flex; flex-wrap:wrap; gap:.35rem; }
+.primary-star{ background:none; border:1px solid var(--border); color:var(--text-faint); border-radius:999px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+.primary-star.active{ color:var(--amber); border-color:var(--amber); background:var(--amber-soft); }
+.primary-star svg{ width:15px; height:15px; }
+
+/* ============ ROADMAP ============ */
+.roadmap-tabs{ display:flex; gap:.4rem; flex-wrap:wrap; }
+.roadmap-tabs button{
+  border:1px solid var(--border); background:var(--surface); color:var(--text-dim); padding:.4rem .75rem;
+  border-radius:999px; font-size:.82rem; cursor:pointer;
+}
+.roadmap-tabs button.active{ background:var(--tabColor,var(--accent)); border-color:transparent; color:#06110f; font-weight:600; }
+
+.timeline{ position:relative; padding-left:34px; display:flex; flex-direction:column; gap:.15rem; }
+.timeline::before{ content:''; position:absolute; left:13px; top:6px; bottom:6px; width:2px; background:var(--border); }
+.node{ position:relative; padding:.65rem 0 1.05rem; }
+.node-dot{
+  position:absolute; left:-34px; top:.65rem; width:28px; height:28px; border-radius:999px; background:var(--surface);
+  border:2px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-faint); z-index:2;
+}
+.node-dot svg{ width:13px; height:13px; }
+.node.completed .node-dot{ border-color:var(--accent); background:var(--accent-soft); color:var(--accent); }
+.node.in-progress .node-dot{ border-color:var(--amber); background:var(--amber-soft); color:var(--amber); }
+.node.available .node-dot{ border-color:var(--blue); color:var(--blue); }
+.node.locked .node-dot{ opacity:.55; }
+.node-card{
+  border:1px solid var(--border); background:var(--surface); border-radius:var(--radius-m); padding:.85rem 1rem;
+  cursor:pointer; transition:border-color .15s ease, transform .1s ease;
+}
+.node-card:hover{ border-color:var(--text-faint); }
+.node.locked .node-card{ opacity:.6; cursor:not-allowed; }
+.node-head{ display:flex; justify-content:space-between; align-items:center; gap:.6rem; flex-wrap:wrap; }
+.node-head h4{ font-size:.95rem; }
+.node-sub{ font-size:.76rem; color:var(--text-faint); margin-top:.15rem; }
+.node-progress{ margin-top:.55rem; display:flex; align-items:center; gap:.6rem; }
+.node-progress .progress-track{ flex:1; }
+.node-progress span{ font-size:.72rem; color:var(--text-faint); font-family:var(--font-mono); min-width:32px; text-align:right; }
+
+.detail-panel{
+  position:fixed; inset:0; z-index:300; display:flex; justify-content:flex-end; background:rgba(6,10,16,.45);
+  animation:fadeIn .15s ease;
+}
+@keyframes fadeIn{ from{ opacity:0;} to{ opacity:1;} }
+.detail-sheet{
+  width:min(420px, 100%); background:var(--surface); height:100%; padding:1.3rem; overflow-y:auto;
+  border-left:1px solid var(--border); animation:slideIn .2s ease;
+}
+@keyframes slideIn{ from{ transform:translateX(24px); opacity:0;} to{ transform:none; opacity:1;} }
+.detail-close{ float:right; }
+.detail-sheet h3{ font-size:1.15rem; margin-bottom:.2rem; }
+.detail-sheet .dep-list{ display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.3rem; }
+.res-link-row{ display:flex; align-items:center; justify-content:space-between; padding:.5rem 0; border-bottom:1px solid var(--border-soft); font-size:.84rem; }
+
+/* ============ MODAL ============ */
+.modal-overlay{ position:fixed; inset:0; background:rgba(6,10,16,.5); display:flex; align-items:center; justify-content:center; z-index:350; padding:1rem; animation:fadeIn .15s ease; }
+.modal{ width:min(560px,100%); max-height:88vh; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-l); padding:1.3rem; box-shadow:var(--shadow); animation:slideIn .18s ease; }
+.modal-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:.9rem; }
+.modal-head h3{ font-size:1.1rem; }
+
+/* ============ COMMAND PALETTE ============ */
+.cmdk-overlay{ position:fixed; inset:0; background:rgba(6,10,16,.5); z-index:500; display:flex; align-items:flex-start; justify-content:center; padding-top:10vh; }
+.cmdk{ width:min(560px,92vw); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-l); box-shadow:var(--shadow); overflow:hidden; }
+.cmdk input{ border:none; border-bottom:1px solid var(--border-soft); border-radius:0; font-size:1rem; padding:.95rem 1.1rem; background:transparent; }
+.cmdk input:focus{ border-bottom-color:var(--accent); }
+.cmdk-results{ max-height:340px; overflow-y:auto; padding:.4rem; }
+.cmdk-item{ display:flex; justify-content:space-between; gap:.6rem; padding:.6rem .7rem; border-radius:var(--radius-s); cursor:pointer; font-size:.87rem; }
+.cmdk-item:hover, .cmdk-item.sel{ background:var(--surface-2); }
+.cmdk-item .k-type{ font-size:.68rem; color:var(--text-faint); }
+.cmdk-empty{ padding:1.2rem; text-align:center; color:var(--text-faint); font-size:.85rem; }
+
+/* ============ RESOURCES / SKILLS ============ */
+.filter-row{ display:flex; gap:.6rem; flex-wrap:wrap; align-items:flex-end; }
+.filter-row .field{ min-width:150px; flex:1; }
+.filter-row .field.search{ flex:2; min-width:200px; }
+
+.res-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.85rem; }
+.res-card{ border:1px solid var(--border); background:var(--surface); border-radius:var(--radius-m); padding:.9rem; display:flex; flex-direction:column; gap:.5rem; box-shadow:var(--shadow); }
+.res-card-top{ display:flex; justify-content:space-between; gap:.5rem; align-items:flex-start; }
+.res-card h4{ font-size:.95rem; }
+.res-card .meta{ font-size:.74rem; color:var(--text-faint); }
+.res-card .notes{ font-size:.8rem; color:var(--text-dim); }
+.res-actions{ display:flex; gap:.35rem; flex-wrap:wrap; margin-top:auto; padding-top:.4rem; }
+.fav-btn{ background:none; border:none; cursor:pointer; color:var(--text-faint); padding:0; }
+.fav-btn.active{ color:var(--amber); }
+.fav-btn svg{ width:17px; height:17px; }
+
+.recent-strip{ display:flex; gap:.6rem; overflow-x:auto; }
+.recent-chip{ flex:0 0 auto; border:1px solid var(--border); background:var(--surface-2); border-radius:var(--radius-s); padding:.5rem .7rem; font-size:.78rem; min-width:150px; }
+.recent-chip .n{ font-weight:600; display:block; margin-bottom:.1rem; }
+.recent-chip .t{ color:var(--text-faint); font-size:.7rem; }
+
+.skill-list-item{ border:1px solid var(--border); background:var(--surface); border-radius:var(--radius-m); padding:.85rem 1rem; display:flex; flex-direction:column; gap:.4rem; }
+.skill-list-item .top{ display:flex; justify-content:space-between; gap:.6rem; align-items:flex-start; flex-wrap:wrap; }
+.skill-list-item .name-row{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; }
+.custom-dot{ width:6px; height:6px; border-radius:999px; background:var(--violet); display:inline-block; }
+
+/* ============ ANALYTICS ============ */
+.stat-card{ text-align:left; }
+.stat-card .val{ font-family:var(--font-display); font-size:1.4rem; font-weight:700; }
+.stat-card .lbl{ font-size:.76rem; color:var(--text-faint); margin-top:.1rem; }
+
+.heat-wrap{ overflow-x:auto; padding-bottom:.3rem; }
+.heatmap{ display:grid; grid-template-rows:repeat(7,13px); grid-auto-flow:column; grid-auto-columns:13px; gap:3px; }
+.cell{ border-radius:3px; border:1px solid var(--border-soft); background:var(--surface-2); }
+.lvl1{ background:color-mix(in srgb, var(--accent) 30%, var(--surface-2)); border-color:transparent; }
+.lvl2{ background:color-mix(in srgb, var(--accent) 55%, var(--surface-2)); border-color:transparent; }
+.lvl3{ background:color-mix(in srgb, var(--accent) 78%, var(--surface-2)); border-color:transparent; }
+.lvl4{ background:var(--accent); border-color:transparent; }
+.heat-scale{ display:flex; align-items:center; gap:.3rem; font-size:.68rem; color:var(--text-faint); margin-top:.4rem; }
+.heat-scale .cell{ width:11px; height:11px; }
+
+.weekly-goal-card{ display:flex; flex-direction:column; gap:.6rem; }
+.wg-row{ display:flex; align-items:center; justify-content:space-between; font-size:.84rem; }
+.wg-row .amt{ font-family:var(--font-mono); color:var(--text-faint); font-size:.78rem; }
+
+/* ============ MOBILE BOTTOM NAV ============ */
+.bottom-nav{ display:none; }
+@media (max-width:880px){
+  .sidebar{ display:none; }
+  .mobile-topbar{
+    display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:45;
+    padding:.8rem 1rem; background:color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border-soft);
+  }
+  main.content{ padding:1rem 1rem 5.5rem; }
+  .bottom-nav{
+    display:flex; position:fixed; bottom:0; left:0; right:0; z-index:60; background:var(--surface);
+    border-top:1px solid var(--border); padding:.4rem .2rem calc(.4rem + env(safe-area-inset-bottom));
+    overflow-x:auto;
+  }
+  .bottom-nav button{
+    flex:1; min-width:64px; display:flex; flex-direction:column; align-items:center; gap:.2rem; background:none; border:none;
+    color:var(--text-faint); padding:.3rem .1rem; font-size:.62rem; cursor:pointer;
+  }
+  .bottom-nav button svg{ width:18px; height:18px; }
+  .bottom-nav button.active{ color:var(--accent); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Desktop sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">P</div>
+      <div>
+        <div class="brand-name">Pathwise</div>
+        <div class="brand-sub" id="brandSub">Data career journey</div>
+      </div>
+    </div>
+    <nav class="navlist" id="navlist"></nav>
+    <div class="sidebar-foot">
+      <div class="streak-chip" id="sidebarStreak"></div>
+      <button class="settings-btn" id="openSettingsBtn" type="button"></button>
+    </div>
+  </aside>
+
+  <!-- Mobile topbar -->
+  <div class="mobile-topbar">
+    <div class="brand"><div class="brand-mark" style="width:26px;height:26px;font-size:.8rem;">P</div><div class="brand-name" style="font-size:.92rem;">Pathwise</div></div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="mSearchBtn" type="button" aria-label="Search"></button>
+      <button class="icon-btn" id="mSettingsBtn" type="button" aria-label="Settings"></button>
+    </div>
+  </div>
+
+  <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+    <header class="topbar">
+      <div class="topbar-title" id="pageTitle">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="search-trigger" id="searchTrigger" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <span>Search skills, resources, paths…</span>
+          <kbd>⌘K</kbd>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+      <div id="pageRoot"></div>
+    </main>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <nav class="bottom-nav" id="bottomNav"></nav>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+<div id="overlayRoot"></div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="var(--accent)"/>
+      <stop offset="100%" stop-color="var(--blue)"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<script>
+'use strict';
+/* =====================================================================
+   CONFIG
+===================================================================== */
+const STORAGE_KEY = 'pathwiseDashboardV2';
+const STATUS = ['Not Started','In Progress','Completed'];
+
+const PATHS = {
+  'Data Analyst':      { desc:'Transforms data into business insight using SQL, BI tooling, spreadsheets and storytelling.', color:'var(--accent)', tools:['SQL','Excel','Power BI','Tableau'], difficulty:'Beginner-friendly' },
+  'Data Scientist':     { desc:'Builds predictive models and runs experiments with statistics, ML and clear communication.', color:'var(--violet)', tools:['Python','pandas','scikit-learn','Statistics'], difficulty:'Moderate' },
+  'Data Engineer':      { desc:'Designs pipelines, storage and reliable data platforms that power analytics and ML.', color:'var(--amber)', tools:['Python','SQL','Airflow','Kafka'], difficulty:'Moderate–Advanced' },
+  'Analytics Engineer': { desc:'Models trusted analytics datasets, metrics layers and semantic transformations.', color:'var(--rose)', tools:['SQL','dbt','Data modeling'], difficulty:'Moderate' },
+  'ML Engineer':        { desc:'Productionizes models with deployment, monitoring and MLOps workflows.', color:'var(--blue)', tools:['Python','FastAPI','Docker','MLOps'], difficulty:'Advanced' }
+};
+const PATH_NAMES = Object.keys(PATHS);
+
+const seedSkills = [
+  { id:'sql-foundations', name:'SQL Foundations', path:'Data Analyst', level:'Beginner', estHours:25, deps:[], resources:[{title:'SQLBolt',url:'https://sqlbolt.com/'},{title:'Mode SQL Tutorial',url:'https://mode.com/sql-tutorial/'}], order:1 },
+  { id:'excel-analysis', name:'Excel & Spreadsheets', path:'Data Analyst', level:'Beginner', estHours:20, deps:[], resources:[{title:'ExcelIsFun',url:'https://www.youtube.com/user/ExcelIsFun'}], order:2 },
+  { id:'data-visualization', name:'Data Visualization (Tableau/Power BI)', path:'Data Analyst', level:'Intermediate', estHours:30, deps:['sql-foundations'], resources:[{title:'Microsoft Power BI Learning',url:'https://learn.microsoft.com/en-us/training/powerplatform/power-bi/'},{title:'Tableau Free Training',url:'https://www.tableau.com/learn/training'}], order:3 },
+  { id:'ab-testing', name:'A/B Testing & Experimentation', path:'Data Analyst', level:'Advanced', estHours:22, deps:['data-visualization'], resources:[{title:'Khan Academy Statistics',url:'https://www.khanacademy.org/math/statistics-probability'}], order:4 },
+
+  { id:'python-basics', name:'Python for Data Work', path:'Data Scientist', level:'Beginner', estHours:35, deps:[], resources:[{title:'Python Data Science Handbook',url:'https://jakevdp.github.io/PythonDataScienceHandbook/'},{title:'freeCodeCamp Python',url:'https://www.freecodecamp.org/learn/scientific-computing-with-python/'}], order:1 },
+  { id:'stats-prob', name:'Statistics & Probability', path:'Data Scientist', level:'Beginner', estHours:40, deps:[], resources:[{title:'OpenIntro Statistics',url:'https://www.openintro.org/book/os/'}], order:2 },
+  { id:'ml-fundamentals', name:'Machine Learning Fundamentals', path:'Data Scientist', level:'Intermediate', estHours:50, deps:['python-basics','stats-prob'], resources:[{title:'Hands-On ML (samples)',url:'https://github.com/ageron/handson-ml3'},{title:'Google ML Crash Course',url:'https://developers.google.com/machine-learning/crash-course'}], order:3 },
+  { id:'model-evaluation', name:'Model Evaluation & Explainability', path:'Data Scientist', level:'Advanced', estHours:28, deps:['ml-fundamentals'], resources:[{title:'Interpretable ML',url:'https://christophm.github.io/interpretable-ml-book/'}], order:4 },
+
+  { id:'python-etl', name:'Python ETL Scripting', path:'Data Engineer', level:'Beginner', estHours:30, deps:[], resources:[{title:'Real Python ETL',url:'https://realpython.com/python-data-cleaning-numpy-pandas/'}], order:1 },
+  { id:'data-warehousing', name:'Data Warehousing Concepts', path:'Data Engineer', level:'Intermediate', estHours:35, deps:['python-etl'], resources:[{title:'Kimball Group Articles',url:'https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/'}], order:2 },
+  { id:'orchestration', name:'Workflow Orchestration (Airflow)', path:'Data Engineer', level:'Intermediate', estHours:30, deps:['python-etl'], resources:[{title:'Apache Airflow Docs',url:'https://airflow.apache.org/docs/'}], order:3 },
+  { id:'streaming', name:'Streaming Data (Kafka Basics)', path:'Data Engineer', level:'Advanced', estHours:26, deps:['data-warehousing'], resources:[{title:'Confluent Kafka 101',url:'https://developer.confluent.io/learn-kafka/'}], order:4 },
+
+  { id:'dbt-basics', name:'dbt Fundamentals', path:'Analytics Engineer', level:'Beginner', estHours:24, deps:['sql-foundations'], resources:[{title:'dbt Learn',url:'https://learn.getdbt.com/'}], order:1 },
+  { id:'dimensional-modeling', name:'Dimensional Modeling', path:'Analytics Engineer', level:'Intermediate', estHours:30, deps:['dbt-basics'], resources:[{title:'The Data Warehouse Toolkit notes',url:'https://www.kimballgroup.com/'}], order:2 },
+  { id:'metrics-layer', name:'Metrics Layer & Semantic Models', path:'Analytics Engineer', level:'Advanced', estHours:28, deps:['dimensional-modeling'], resources:[{title:'Transform blog',url:'https://www.getdbt.com/blog'}], order:3 },
+
+  { id:'software-eng', name:'Software Engineering for ML', path:'ML Engineer', level:'Intermediate', estHours:30, deps:['python-basics'], resources:[{title:'Full Stack Deep Learning',url:'https://fullstackdeeplearning.com/'}], order:1 },
+  { id:'model-deploy', name:'Model Deployment APIs', path:'ML Engineer', level:'Advanced', estHours:35, deps:['ml-fundamentals','software-eng'], resources:[{title:'FastAPI Docs',url:'https://fastapi.tiangolo.com/'}], order:2 },
+  { id:'mlops-monitoring', name:'MLOps Monitoring & Drift', path:'ML Engineer', level:'Advanced', estHours:26, deps:['model-deploy'], resources:[{title:'Made With ML Ops',url:'https://madewithml.com/'}], order:3 }
+].map(s => ({ ...s, status:'Not Started', notes:'', goal:'', isCustom:false, completedAt:null }));
+
+const seedResources = [
+  { id:'r1', name:'Kaggle Learn', url:'https://www.kaggle.com/learn', category:'Practice', notes:'Short applied courses with hands-on notebooks.', status:'Not Started', path:'Data Scientist', skillId:'python-basics', favorite:false, lastOpenedAt:null },
+  { id:'r2', name:'DataTalksClub Zoomcamps', url:'https://github.com/DataTalksClub', category:'Bootcamp', notes:'Free cohort-based data engineering and ML courses.', status:'Not Started', path:'Data Engineer', skillId:'python-etl', favorite:false, lastOpenedAt:null }
+];
+
+const ACHIEVEMENTS = [
+  { id:'first-skill', name:'First Skill Completed', desc:'Complete your first skill.', test:s => s.skills.filter(k=>k.status==='Completed').length >= 1, progress:s => [s.skills.filter(k=>k.status==='Completed').length, 1] },
+  { id:'10h', name:'10 Hours Learned', desc:'Log 10 hours of focused learning.', test:s => totalHours(s) >= 10, progress:s => [Math.min(totalHours(s),10).toFixed(1), 10] },
+  { id:'7day', name:'7-Day Streak', desc:'Keep a 7-day learning streak.', test:s => getStreaks(s).longest >= 7, progress:s => [getStreaks(s).longest, 7] },
+  { id:'25h', name:'25 Hours Learned', desc:'Log 25 hours of focused learning.', test:s => totalHours(s) >= 25, progress:s => [Math.min(totalHours(s),25).toFixed(1), 25] },
+  { id:'10skills', name:'10 Skills Completed', desc:'Complete 10 skills across any paths.', test:s => s.skills.filter(k=>k.status==='Completed').length >= 10, progress:s => [s.skills.filter(k=>k.status==='Completed').length, 10] },
+  { id:'30day', name:'30-Day Streak', desc:'Keep a 30-day learning streak.', test:s => getStreaks(s).longest >= 30, progress:s => [getStreaks(s).longest, 30] },
+  { id:'path-complete', name:'First Career Path Completed', desc:'Finish every skill in one career path.', test:s => PATH_NAMES.some(p => pathProgress(s,p) >= 100), progress:s => [Math.round(Math.max(...PATH_NAMES.map(p=>pathProgress(s,p)))), 100] },
+  { id:'job-ready', name:'Job Ready', desc:'Complete your selected primary path end to end.', test:s => s.settings.primaryPath && pathProgress(s, s.settings.primaryPath) >= 100, progress:s => [Math.round(pathProgress(s, s.settings.primaryPath||PATH_NAMES[0])), 100] }
+];
+
+const DEFAULT_SETTINGS = {
+  name:'', primaryPath:'', weeklyHoursTarget:10, weeklySkillsTarget:2, dailyHoursTarget:1,
+  startDate: isoDate(new Date()), careerGoal:'', theme:'dark'
+};
+
+const SECTIONS = [
+  { id:'dashboard', label:'Dashboard', icon:'grid' },
+  { id:'paths', label:'Career Paths', icon:'compass' },
+  { id:'roadmap', label:'Roadmap', icon:'route' },
+  { id:'progress', label:'Progress', icon:'chart' },
+  { id:'resources', label:'Resources', icon:'book' },
+  { id:'skills', label:'Skills', icon:'layers' },
+  { id:'activity', label:'Activity', icon:'flame' },
+  { id:'goals', label:'Goals & Notes', icon:'target' }
+];
+
+/* =====================================================================
+   ICONS (inline, self-contained)
+===================================================================== */
+const ICONS = {
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+  route:'<circle cx="6" cy="6" r="2.3"/><circle cx="18" cy="18" r="2.3"/><path d="M6 8.3V13a4 4 0 0 0 4 4h4"/>',
+  chart:'<path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/>',
+  book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21z"/><path d="M4 18.5V5.5"/>',
+  layers:'<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
+  flame:'<path d="M12 2c1 3-2 4-2 7a4 4 0 0 0 8 0c0-2-1-3-1-3s2 2 2 6a7 7 0 0 1-14 0c0-5 4-6 5-10z"/>',
+  target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor" stroke="none"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  close:'<path d="M18 6L6 18"/><path d="M6 6l12 12"/>',
+  check:'<path d="M20 6L9 17l-5-5"/>',
+  lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  arrowRight:'<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
+  star:'<path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.2L12 16.9 6.4 20l1.4-6.2-4.8-4.3 6.4-.6z"/>',
+  bookmark:'<path d="M6 3h12v18l-6-4-6 4z"/>',
+  plus:'<path d="M12 5v14"/><path d="M5 12h14"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  trash:'<path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4h6v3"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
+  ext:'<path d="M14 4h6v6"/><path d="M10 14L20 4"/><path d="M20 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/>'
+};
+function icon(name, cls){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="${cls||''}">${ICONS[name]||''}</svg>`; }
+
+/* =====================================================================
+   STATE + STORAGE
+===================================================================== */
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function isoDate(d){ return d.toISOString().slice(0,10); }
+function escapeHtml(str){
+  return String(str==null?'':str)
+    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+    .replaceAll('"','&quot;').replaceAll("'",'&#39;');
+}
+function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+function statusWeight(status){ return status==='Completed' ? 1 : status==='In Progress' ? 0.5 : 0; }
+
+function defaultState(){
+  return {
+    skills: JSON.parse(JSON.stringify(seedSkills)),
+    resources: JSON.parse(JSON.stringify(seedResources)),
+    activity: {},
+    notes:'', goals:'',
+    settings: { ...DEFAULT_SETTINGS }
+  };
+}
+
+function mergeState(raw){
+  const base = defaultState();
+  if(!raw || typeof raw !== 'object') return base;
+  const map = new Map(base.skills.map(s=>[s.id,s]));
+  (raw.skills||[]).forEach(s=>{
+    if(!s || !s.id) return;
+    if(map.has(s.id)) map.set(s.id, { ...map.get(s.id), ...s, isCustom: !!map.get(s.id).isCustom && !s.hasOwnProperty('isCustom') ? map.get(s.id).isCustom : !!s.isCustom });
+    else map.set(s.id, {
+      id:s.id, name:s.name||'Custom Skill', path:s.path||PATH_NAMES[0], level:s.level||'Beginner',
+      estHours:Number(s.estHours)||10, deps:Array.isArray(s.deps)?s.deps:[], resources:Array.isArray(s.resources)?s.resources:[],
+      order:Number(s.order)||99, status:STATUS.includes(s.status)?s.status:'Not Started', notes:s.notes||'', goal:s.goal||'',
+      isCustom:true, completedAt:s.completedAt||null
+    });
+  });
+  return {
+    skills: Array.from(map.values()),
+    resources: Array.isArray(raw.resources) ? raw.resources.map(r=>({
+      id:r.id||uid(), name:r.name||'Untitled', url:r.url||'', category:r.category||'General',
+      notes:r.notes||'', status:STATUS.includes(r.status)?r.status:'Not Started', path:r.path||PATH_NAMES[0],
+      skillId:r.skillId||'', favorite:!!r.favorite, lastOpenedAt:r.lastOpenedAt||null
+    })) : base.resources,
+    activity: raw.activity && typeof raw.activity==='object' ? raw.activity : {},
+    notes: typeof raw.notes==='string' ? raw.notes : '',
+    goals: typeof raw.goals==='string' ? raw.goals : '',
+    settings: { ...DEFAULT_SETTINGS, ...(raw.settings||{}) }
+  };
+}
+
+const storage = (() => {
+  try{
+    const k='__pw_test__'; localStorage.setItem(k,'1'); localStorage.removeItem(k);
+    return {
+      available:true,
+      read(){ const raw=localStorage.getItem(STORAGE_KEY); return raw ? mergeState(JSON.parse(raw)) : defaultState(); },
+      write(state){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    };
+  }catch{
+    let mem = defaultState();
+    return { available:false, read(){ return mem; }, write(s){ mem = s; } };
+  }
+})();
+
+let state = storage.read();
+let currentSection = 'dashboard';
+let roadmapActivePath = state.settings.primaryPath || PATH_NAMES[0];
+let cmdkIndex = 0;
+
+function saveState(opts){
+  try{ storage.write(state); }catch{ showToast('Could not save changes — storage may be full.'); }
+  applyTheme();
+  if(!opts || !opts.skip) renderApp();
+}
+
+/* =====================================================================
+   DERIVED DATA HELPERS (state passed explicitly so they work in ACHIEVEMENTS too)
+===================================================================== */
+function skillById(id){ return state.skills.find(s=>s.id===id); }
+function skillsForPath(path){ return state.skills.filter(s=>s.path===path).sort((a,b)=>a.order-b.order); }
+
+function hoursForSkill(skillId, s){
+  s = s || state;
+  return Object.values(s.activity).reduce((sum,day)=> sum + (day.skillId===skillId ? Number(day.hours||0) : 0), 0);
+}
+function skillProgressPct(skill, s){
+  s = s || state;
+  if(skill.status==='Completed') return 100;
+  const logged = hoursForSkill(skill.id, s);
+  if(!skill.estHours) return 0;
+  return clamp(Math.round((logged/skill.estHours)*100), 0, 99);
+}
+function lastStudiedDate(skillId, s){
+  s = s || state;
+  const dates = Object.entries(s.activity).filter(([,v])=>v.skillId===skillId).map(([d])=>d).sort();
+  return dates.length ? dates[dates.length-1] : null;
+}
+function isSkillLocked(skill){
+  if(!skill.deps || !skill.deps.length) return false;
+  return skill.deps.some(dep => { const d=skillById(dep); return !d || d.status!=='Completed'; });
+}
+function pathProgress(s, path){
+  s = s || state;
+  const items = s.skills.filter(sk=>sk.path===path);
+  if(!items.length) return 0;
+  return (items.reduce((sum,sk)=>sum+statusWeight(sk.status),0)/items.length)*100;
+}
+function overallProgress(s){
+  s = s || state;
+  if(!s.skills.length) return 0;
+  return (s.skills.reduce((sum,sk)=>sum+statusWeight(sk.status),0)/s.skills.length)*100;
+}
+function totalHours(s){ s = s || state; return Object.values(s.activity).reduce((sum,d)=>sum+Number(d.hours||0),0); }
+function hoursInLastNDays(n, s){
+  s = s || state;
+  let total=0; const now=new Date();
+  for(let i=0;i<n;i++){ const d=new Date(now); d.setDate(now.getDate()-i); total += Number(s.activity[isoDate(d)]?.hours||0); }
+  return total;
+}
+function hoursThisMonth(s){
+  s = s || state;
+  const now = new Date(); const ym = now.toISOString().slice(0,7);
+  return Object.entries(s.activity).filter(([d])=>d.startsWith(ym)).reduce((sum,[,v])=>sum+Number(v.hours||0),0);
+}
+function activeDaysCount(s){ s = s || state; return Object.values(s.activity).filter(d=>Number(d.hours||0)>0).length; }
+function dayDiff(a,b){ return Math.round((new Date(b+'T00:00:00Z') - new Date(a+'T00:00:00Z'))/86400000); }
+function getStreaks(s){
+  s = s || state;
+  const days = Object.keys(s.activity).filter(d=>Number(s.activity[d]?.hours||0)>0).sort();
+  if(!days.length) return { current:0, longest:0 };
+  let longest=1, run=1;
+  for(let i=1;i<days.length;i++){ run = dayDiff(days[i-1],days[i])===1 ? run+1 : 1; longest = Math.max(longest,run); }
+  let current=0, cursor=isoDate(new Date());
+  while(s.activity[cursor] && Number(s.activity[cursor].hours||0)>0){ current++; cursor = isoDate(new Date(new Date(cursor).getTime()-86400000)); }
+  return { current, longest };
+}
+function bestLearningDay(s){
+  s = s || state;
+  const entries = Object.entries(s.activity);
+  if(!entries.length) return null;
+  return entries.reduce((best,cur)=> Number(cur[1].hours||0) > Number((best?.[1]||{}).hours||0) ? cur : best, null);
+}
+function consistencyPct(s){
+  s = s || state;
+  const start = s.settings.startDate ? new Date(s.settings.startDate+'T00:00:00Z') : null;
+  if(!start) return 0;
+  const days = Math.max(1, dayDiff(isoDate(start), isoDate(new Date()))+1);
+  return clamp(Math.round((activeDaysCount(s)/days)*100),0,100);
+}
+function nextRecommendedSkill(pathName){
+  const list = skillsForPath(pathName).filter(s=>s.status!=='Completed' && !isSkillLocked(s));
+  return list[0] || null;
+}
+function inProgressForPath(pathName){
+  return skillsForPath(pathName)
+    .filter(s=>s.status==='In Progress' || (s.status!=='Completed' && hoursForSkill(s.id)>0))
+    .sort((a,b)=> skillProgressPct(b) - skillProgressPct(a))[0] || null;
+}
+function continueLearningSkill(){
+  const primary = state.settings.primaryPath;
+  const order = primary ? [primary, ...PATH_NAMES.filter(p=>p!==primary)] : PATH_NAMES;
+  for(const p of order){ const s = inProgressForPath(p); if(s) return { skill:s, path:p }; }
+  for(const p of order){ const s = nextRecommendedSkill(p); if(s) return { skill:s, path:p }; }
+  return null;
+}
+function skillsCompletedInLastNDays(n, s){
+  s = s || state; const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-n+1);
+  return s.skills.filter(sk=>sk.completedAt && new Date(sk.completedAt) >= new Date(isoDate(cutoff)+'T00:00:00Z')).length;
+}
+
+/* =====================================================================
+   TOASTS
+===================================================================== */
+function showToast(msg){
+  const stack = document.getElementById('toastStack');
+  const el = document.createElement('div');
+  el.className = 'toast'; el.setAttribute('role','status'); el.textContent = msg;
+  stack.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .25s ease'; el.style.opacity='0'; setTimeout(()=>el.remove(),260); }, 2600);
+}
+
+/* =====================================================================
+   THEME
+===================================================================== */
+function applyTheme(){
+  const t = state.settings.theme || 'dark';
+  document.documentElement.dataset.theme = t === 'system' ? '' : t;
+}
+
+/* =====================================================================
+   RENDER: SHELL (nav, sidebar, topbar)
+===================================================================== */
+function renderShell(){
+  const navlist = document.getElementById('navlist');
+  navlist.innerHTML = SECTIONS.map(s => `
+    <button data-nav="${s.id}" class="${s.id===currentSection?'active':''}">
+      ${icon(s.icon)} <span>${s.label}</span>
+    </button>`).join('');
+  navlist.querySelectorAll('[data-nav]').forEach(btn=>{
+    btn.onclick = ()=>{ currentSection = btn.dataset.nav; renderApp(); };
+  });
+
+  const bottom = document.getElementById('bottomNav');
+  bottom.innerHTML = SECTIONS.map(s=>`
+    <button data-nav="${s.id}" class="${s.id===currentSection?'active':''}">
+      ${icon(s.icon)}<span>${s.label.split(' ')[0]}</span>
+    </button>`).join('');
+  bottom.querySelectorAll('[data-nav]').forEach(btn=>{
+    btn.onclick = ()=>{ currentSection = btn.dataset.nav; renderApp(); };
+  });
+
+  document.getElementById('pageTitle').textContent = SECTIONS.find(s=>s.id===currentSection).label;
+  document.getElementById('brandSub').textContent = state.settings.primaryPath ? state.settings.primaryPath : 'Data career journey';
+
+  const { current } = getStreaks();
+  document.getElementById('sidebarStreak').innerHTML = `${icon('flame')} <span>${current} day${current===1?'':'s'} streak</span>`;
+
+  const settingsBtnHtml = `${icon('settings')} <span>Settings</span>`;
+  document.getElementById('openSettingsBtn').innerHTML = settingsBtnHtml;
+  document.getElementById('openSettingsBtn').onclick = openSettingsModal;
+  document.getElementById('mSettingsBtn').innerHTML = icon('settings');
+  document.getElementById('mSettingsBtn').onclick = openSettingsModal;
+  document.getElementById('mSearchBtn').innerHTML = icon('search');
+  document.getElementById('mSearchBtn').onclick = openCommandPalette;
+
+  document.getElementById('searchTrigger').onclick = openCommandPalette;
+}
+
+/* =====================================================================
+   RENDER: DASHBOARD
+===================================================================== */
+function ringSvg(pct, size, strokeColorVar){
+  const r = (size-14)/2, c = 2*Math.PI*r, offset = c - (pct/100)*c;
+  return `<svg viewBox="0 0 ${size} ${size}">
+    <circle class="ring-bg" cx="${size/2}" cy="${size/2}" r="${r}"></circle>
+    <circle class="ring-fg" cx="${size/2}" cy="${size/2}" r="${r}" stroke="${strokeColorVar||'url(#ringGrad)'}"
+      stroke-dasharray="${c}" stroke-dashoffset="${offset}"></circle>
+  </svg>`;
+}
+
+function renderDashboard(root){
+  const progress = overallProgress();
+  const { current, longest } = getStreaks();
+  const todayHours = Number(state.activity[isoDate(new Date())]?.hours || 0);
+  const weekHours = hoursInLastNDays(7);
+  const completed = state.skills.filter(s=>s.status==='Completed').length;
+  const remaining = state.skills.length - completed;
+  const cl = continueLearningSkill();
+  const name = state.settings.name ? `, ${escapeHtml(state.settings.name)}` : '';
+
+  root.innerHTML = `
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <div class="eyebrow">Welcome back${name}</div>
+          <h1>Here's where your data career stands today</h1>
+        </div>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-card">
+          <div class="ring-wrap">${ringSvg(progress,132)}<div class="ring-center"><div class="num">${Math.round(progress)}%</div><div class="lbl">overall</div></div></div>
+          <div class="hero-copy">
+            <div class="eyebrow">Current focus</div>
+            <h2>${escapeHtml(state.settings.primaryPath || 'No path selected yet')}</h2>
+            <p>${state.settings.primaryPath ? escapeHtml(PATHS[state.settings.primaryPath].desc) : 'Pick a primary career path to personalize your roadmap and recommendations.'}</p>
+            <div class="hero-stats">
+              <div class="hero-stat"><b>${completed}/${state.skills.length}</b><span>skills completed</span></div>
+              <div class="hero-stat"><b>${remaining}</b><span>skills remaining</span></div>
+              <div class="hero-stat"><b>${totalHours().toFixed(1)}h</b><span>total learned</span></div>
+            </div>
+            ${!state.settings.primaryPath ? `<button class="btn btn-primary" id="pickPathBtn" style="margin-top:.8rem;">Choose primary path</button>` : ''}
+          </div>
+        </div>
+
+        <div class="streak-card">
+          <div>
+            <div class="streak-top">
+              <div>
+                <div class="eyebrow">Streak</div>
+                <div class="streak-num" id="streakNum">${current}</div>
+              </div>
+              ${icon('flame','streak-flame')}
+            </div>
+            <div class="streak-note">${current===0 ? "Log today's session to start a streak." : longest===current && current>1 ? "You're on your longest streak yet." : 'Keep the chain going.'}</div>
+          </div>
+          <div class="streak-meta">
+            <div>Longest <b>${longest}d</b></div>
+            <div>Today <b>${todayHours}h</b></div>
+            <div>This week <b>${weekHours.toFixed(1)}h</b></div>
+          </div>
+        </div>
+      </div>
+
+      ${cl ? `
+      <div class="continue-card">
+        <div class="continue-info">
+          <div class="eyebrow">Continue learning</div>
+          <h3>${escapeHtml(cl.skill.name)}</h3>
+          <div class="meta">
+            <span>${escapeHtml(cl.path)}</span>
+            <span>${skillProgressPct(cl.skill)}% complete</span>
+            <span>~${Math.max(0, cl.skill.estHours - hoursForSkill(cl.skill.id))}h remaining</span>
+          </div>
+        </div>
+        <div class="continue-bar">
+          <div class="progress-track"><div class="progress-fill" style="width:${skillProgressPct(cl.skill)}%"></div></div>
+        </div>
+        <button class="btn btn-primary" id="continueBtn">Continue learning ${icon('arrowRight')}</button>
+      </div>` : `
+      <div class="empty">
+        <h4>You're all caught up</h4>
+        <p>Every unlocked skill is complete. Log new activity or explore another career path.</p>
+        <button class="btn btn-primary" data-goto="roadmap">Browse roadmap</button>
+      </div>`}
+
+      <div class="grid g2">
+        <div class="panel">
+          <div class="section-title"><h3>Career path comparison</h3></div>
+          <div class="path-compare">
+            ${PATH_NAMES.map(p=>{
+              const pct = pathProgress(state,p);
+              return `<div class="path-compare-row">
+                <div class="pname">${escapeHtml(p)}</div>
+                <div class="progress-track"><div class="progress-fill" style="width:${pct}%; background:linear-gradient(90deg, ${PATHS[p].color}, ${PATHS[p].color})"></div></div>
+                <div class="pval">${Math.round(pct)}%</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title"><h3>Learning momentum — last 7 days</h3></div>
+          <div class="mini-bars">${last7DaysBars()}</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title"><h3>Milestones</h3><button class="link" data-goto="goals">View all</button></div>
+        <div class="milestone-strip">
+          ${ACHIEVEMENTS.slice(0,6).map(a=>{
+            const done = a.test(state);
+            return `<div class="milestone-chip ${done?'done':''}">${icon(done?'check':'lock')} ${escapeHtml(a.name)}</div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title"><h3>Recent activity</h3><button class="link" data-goto="activity">Log activity</button></div>
+        ${renderActivityFeed(6)}
+      </div>
+    </div>
+  `;
+
+  root.querySelectorAll('[data-goto]').forEach(b=> b.onclick = ()=>{ currentSection = b.dataset.goto; renderApp(); });
+  const pickBtn = document.getElementById('pickPathBtn'); if(pickBtn) pickBtn.onclick = ()=>{ currentSection='paths'; renderApp(); };
+  const contBtn = document.getElementById('continueBtn');
+  if(contBtn) contBtn.onclick = ()=>{ currentSection='roadmap'; roadmapActivePath = cl.path; renderApp(()=>openSkillDetail(cl.skill.id)); };
+}
+
+function last7DaysBars(){
+  const days = [];
+  const now = new Date();
+  for(let i=6;i>=0;i--){ const d=new Date(now); d.setDate(now.getDate()-i); days.push(d); }
+  const hoursArr = days.map(d=>Number(state.activity[isoDate(d)]?.hours||0));
+  const max = Math.max(1, ...hoursArr);
+  return days.map((d,i)=>{
+    const h = hoursArr[i];
+    const pct = (h/max)*100;
+    const lbl = d.toLocaleDateString(undefined,{weekday:'narrow'});
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+      <div class="bar" style="width:100%;"><span style="height:${pct}%"></span></div>
+      <div class="lbl">${lbl}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderActivityFeed(limit){
+  const entries = Object.entries(state.activity).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,limit||8);
+  if(!entries.length) return `<div class="empty"><h4>No activity yet</h4><p>Log your first learning session to start building your streak.</p><button class="btn btn-primary" data-goto="activity">Log today's activity</button></div>`;
+  return `<div class="activity-feed">${entries.map(([d,v])=>{
+    const skill = v.skillId ? skillById(v.skillId) : null;
+    return `<div class="activity-row">
+      <div class="activity-dot"></div>
+      <div class="d">${d}</div>
+      <div><span class="t">${Number(v.hours||0)}h${skill?` · ${escapeHtml(skill.name)}`:''}${v.topic?` · ${escapeHtml(v.topic)}`:''}</span>${v.note?`<div class="s">${escapeHtml(v.note)}</div>`:''}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* =====================================================================
+   RENDER: CAREER PATHS
+===================================================================== */
+function renderPaths(root){
+  root.innerHTML = `
+    <div class="page">
+      <div class="page-head">
+        <div><h1>Career paths</h1><p>Pick a primary path to personalize your dashboard, roadmap and recommendations.</p></div>
+      </div>
+      <div class="grid g2" id="pathCards"></div>
+    </div>`;
+  const wrap = document.getElementById('pathCards');
+  wrap.innerHTML = PATH_NAMES.map(p=>{
+    const meta = PATHS[p];
+    const pct = pathProgress(state,p);
+    const items = skillsForPath(p);
+    const doneCount = items.filter(s=>s.status==='Completed').length;
+    const next = nextRecommendedSkill(p);
+    const totalH = items.reduce((s,i)=>s+i.estHours,0);
+    const isPrimary = state.settings.primaryPath === p;
+    return `<div class="path-card" style="--pathColor:${meta.color}">
+      <div class="path-card-head">
+        <div>
+          <h3>${escapeHtml(p)}</h3>
+          <div class="desc">${escapeHtml(meta.desc)}</div>
+        </div>
+        <button class="primary-star ${isPrimary?'active':''}" data-primary="${p}" title="Set as primary path" aria-pressed="${isPrimary}">${icon('star')}</button>
+      </div>
+      <div class="path-ring-row">
+        <div class="path-mini-ring">${ringSvg(pct,54,meta.color)}</div>
+        <div style="flex:1">
+          <div class="path-facts">
+            <div><b>${doneCount}/${items.length}</b> skills</div>
+            <div><b>${totalH}h</b> total</div>
+            <div><b>${meta.difficulty}</b></div>
+          </div>
+          <div class="progress-track" style="margin-top:.4rem"><div class="progress-fill" style="width:${pct}%; background:${meta.color}"></div></div>
+        </div>
+      </div>
+      <div class="tool-row">${meta.tools.map(t=>`<span class="tag tag-muted">${escapeHtml(t)}</span>`).join('')}</div>
+      <hr class="divider" />
+      <div style="font-size:.82rem; color:var(--text-dim);">
+        ${next ? `Next up: <strong style="color:var(--text)">${escapeHtml(next.name)}</strong>` : (pct>=100 ? 'All skills complete — congratulations.' : 'No unlocked skills remaining right now.')}
+      </div>
+      <button class="btn" data-view-roadmap="${p}">View roadmap ${icon('arrowRight')}</button>
+    </div>`;
+  }).join('');
+
+  wrap.querySelectorAll('[data-primary]').forEach(btn=>{
+    btn.onclick = ()=>{
+      state.settings.primaryPath = state.settings.primaryPath===btn.dataset.primary ? '' : btn.dataset.primary;
+      saveState();
+      showToast(state.settings.primaryPath ? `${state.settings.primaryPath} set as primary path.` : 'Primary path cleared.');
+    };
+  });
+  wrap.querySelectorAll('[data-view-roadmap]').forEach(btn=>{
+    btn.onclick = ()=>{ roadmapActivePath = btn.dataset.viewRoadmap; currentSection='roadmap'; renderApp(); };
+  });
+}
+
+/* =====================================================================
+   RENDER: ROADMAP
+===================================================================== */
+function nodeStateOf(skill){
+  if(skill.status==='Completed') return 'completed';
+  if(isSkillLocked(skill)) return 'locked';
+  if(skill.status==='In Progress' || hoursForSkill(skill.id)>0) return 'in-progress';
+  return 'available';
+}
+function nodeIcon(st){ return st==='completed' ? 'check' : st==='locked' ? 'lock' : st==='in-progress' ? 'flame' : 'arrowRight'; }
+
+function renderRoadmap(root){
+  if(!PATH_NAMES.includes(roadmapActivePath)) roadmapActivePath = PATH_NAMES[0];
+  root.innerHTML = `
+    <div class="page">
+      <div class="page-head">
+        <div><h1>Roadmap</h1><p>Foundation → Core skills → Advanced skills → Job ready. Click any step for details.</p></div>
+      </div>
+      <div class="roadmap-tabs" id="roadmapTabs"></div>
+      <div id="roadmapNext"></div>
+      <div class="timeline" id="timeline"></div>
+    </div>`;
+
+  const tabs = document.getElementById('roadmapTabs');
+  tabs.innerHTML = PATH_NAMES.map(p=>`<button data-tab="${p}" class="${p===roadmapActivePath?'active':''}" style="--tabColor:${PATHS[p].color}">${escapeHtml(p)}</button>`).join('');
+  tabs.querySelectorAll('[data-tab]').forEach(b=> b.onclick = ()=>{ roadmapActivePath = b.dataset.tab; renderRoadmap(root); });
+
+  const next = nextRecommendedSkill(roadmapActivePath);
+  const nextEl = document.getElementById('roadmapNext');
+  nextEl.innerHTML = next ? `
+    <div class="continue-card">
+      <div class="continue-info">
+        <div class="eyebrow" style="color:${PATHS[roadmapActivePath].color}">Your next step</div>
+        <h3>${escapeHtml(next.name)}</h3>
+        <div class="meta"><span>${(next.deps||[]).length} prerequisite${(next.deps||[]).length===1?'':'s'} completed</span><span>~${Math.max(0,next.estHours-hoursForSkill(next.id))}h remaining</span></div>
+      </div>
+      <button class="btn btn-primary" id="startNextBtn">Start skill ${icon('arrowRight')}</button>
+    </div>` : `<div class="empty"><h4>Path complete</h4><p>Every skill in ${escapeHtml(roadmapActivePath)} is finished. Nice work — explore another path.</p></div>`;
+  const startBtn = document.getElementById('startNextBtn');
+  if(startBtn) startBtn.onclick = ()=>openSkillDetail(next.id);
+
+  const items = skillsForPath(roadmapActivePath);
+  const timeline = document.getElementById('timeline');
+  timeline.innerHTML = items.map(skill=>{
+    const st = nodeStateOf(skill);
+    const pct = skillProgressPct(skill);
+    return `<div class="node ${st}">
+      <div class="node-dot">${icon(nodeIcon(st))}</div>
+      <div class="node-card" data-open="${skill.id}">
+        <div class="node-head">
+          <h4>${escapeHtml(skill.name)}</h4>
+          <span class="tag ${st==='completed'?'tag-accent':st==='in-progress'?'tag-amber':st==='locked'?'tag-muted':'tag-blue'}">${st==='locked'?'Locked':st==='completed'?'Completed':st==='in-progress'?'In progress':'Available'}</span>
+        </div>
+        <div class="node-sub">${skill.level} · ~${skill.estHours}h${skill.deps.length?` · needs ${skill.deps.map(d=>skillById(d)?.name||d).join(', ')}`:''}</div>
+        <div class="node-progress"><div class="progress-track"><div class="progress-fill ${st==='in-progress'?'amber':''}" style="width:${pct}%"></div></div><span>${pct}%</span></div>
+      </div>
+    </div>`;
+  }).join('');
+  timeline.querySelectorAll('[data-open]').forEach(card=> card.onclick = ()=>openSkillDetail(card.dataset.open));
+}
+
+function openSkillDetail(skillId){
+  const skill = skillById(skillId);
+  if(!skill) return;
+  const st = nodeStateOf(skill);
+  const overlay = document.getElementById('overlayRoot');
+  const deps = (skill.deps||[]).map(d=>{ const dep=skillById(d); return `<span class="tag ${dep&&dep.status==='Completed'?'tag-accent':'tag-muted'}">${escapeHtml(dep?dep.name:d)}</span>`; }).join('') || '<span class="tag tag-muted">None</span>';
+  overlay.innerHTML = `
+    <div class="detail-panel" id="detailOverlay">
+      <div class="detail-sheet">
+        <button class="icon-btn detail-close" id="closeDetail">${icon('close')}</button>
+        <div class="eyebrow" style="color:${PATHS[skill.path].color}">${escapeHtml(skill.path)} · ${skill.level}</div>
+        <h3>${escapeHtml(skill.name)}</h3>
+        <div class="node-sub">~${skill.estHours}h estimated · ${hoursForSkill(skill.id).toFixed(1)}h logged${lastStudiedDate(skill.id)?` · last studied ${lastStudiedDate(skill.id)}`:''}</div>
+        <div class="progress-track" style="margin-top:.6rem"><div class="progress-fill" style="width:${skillProgressPct(skill)}%"></div></div>
+
+        <div style="margin-top:1rem" class="field">
+          <label>Status</label>
+          <select id="detailStatus" ${st==='locked'?'disabled':''}>${STATUS.map(o=>`<option ${o===skill.status?'selected':''}>${o}</option>`).join('')}</select>
+        </div>
+        ${st==='locked' ? `<p class="node-sub" style="margin-top:.4rem">Complete the prerequisites below to unlock this skill.</p>` : ''}
+
+        <div style="margin-top:.9rem">
+          <label>Prerequisites</label>
+          <div class="dep-list">${deps}</div>
+        </div>
+
+        <div style="margin-top:.9rem" class="field">
+          <label>Personal goal</label>
+          <input id="detailGoal" value="${escapeHtml(skill.goal||'')}" placeholder="e.g. complete in 3 weeks" />
+        </div>
+        <div style="margin-top:.7rem" class="field">
+          <label>Notes</label>
+          <textarea id="detailNotes" placeholder="Your notes...">${escapeHtml(skill.notes||'')}</textarea>
+        </div>
+
+        <div style="margin-top:1rem">
+          <label>Free resources</label>
+          ${(skill.resources||[]).map(r=>`<div class="res-link-row"><span>${escapeHtml(r.title)}</span><a href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">Open ${icon('ext')}</a></div>`).join('') || '<div class="node-sub">No resources linked yet.</div>'}
+        </div>
+
+        <div class="row" style="margin-top:1.1rem; display:flex; gap:.5rem;">
+          <button class="btn btn-primary" id="detailSave">Save changes</button>
+          ${skill.status!=='Completed' && st!=='locked' ? `<button class="btn" id="detailComplete">Mark complete</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('closeDetail').onclick = closeOverlay;
+  document.getElementById('detailOverlay').addEventListener('click', e=>{ if(e.target.id==='detailOverlay') closeOverlay(); });
+  document.getElementById('detailSave').onclick = ()=>{
+    skill.notes = document.getElementById('detailNotes').value.trim();
+    skill.goal = document.getElementById('detailGoal').value.trim();
+    const newStatus = document.getElementById('detailStatus').value;
+    setSkillStatus(skill, newStatus);
+    closeOverlay();
+    saveState();
+    showToast('Skill updated.');
+  };
+  const completeBtn = document.getElementById('detailComplete');
+  if(completeBtn) completeBtn.onclick = ()=>{
+    skill.notes = document.getElementById('detailNotes').value.trim();
+    skill.goal = document.getElementById('detailGoal').value.trim();
+    setSkillStatus(skill,'Completed');
+    closeOverlay();
+    saveState();
+    showToast(`${skill.name} marked complete.`);
+  };
+}
+function setSkillStatus(skill, status){
+  skill.status = status;
+  if(status==='Completed' && !skill.completedAt) skill.completedAt = isoDate(new Date());
+  if(status!=='Completed') skill.completedAt = skill.completedAt; // keep history
+}
+function closeOverlay(){ document.getElementById('overlayRoot').innerHTML=''; }
+
+/* =====================================================================
+   RENDER: PROGRESS
+===================================================================== */
+function renderProgress(root){
+  const rows = [...state.skills].sort((a,b)=>a.path.localeCompare(b.path)||a.order-b.order).map(s=>{
+    const pct = skillProgressPct(s);
+    return `<tr>
+      <td><span class="tag tag-muted">${escapeHtml(s.path)}</span></td>
+      <td>${escapeHtml(s.name)}${s.isCustom?' <span class="custom-dot" title="Custom skill"></span>':''}</td>
+      <td>${s.level}</td>
+      <td class="mono">${s.estHours}h</td>
+      <td style="min-width:140px"><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div></td>
+      <td><span class="tag ${s.status==='Completed'?'tag-accent':s.status==='In Progress'?'tag-amber':'tag-muted'}">${s.status}</span></td>
+    </tr>`;
+  }).join('');
+
+  const last8Weeks = [];
+  for(let i=7;i>=0;i--){
+    const end = new Date(); end.setDate(end.getDate()-i*7);
+    const start = new Date(end); start.setDate(end.getDate()-6);
+    const count = state.skills.filter(s=>{
+      if(!s.completedAt) return false;
+      const d = new Date(s.completedAt+'T00:00:00Z');
+      return d >= new Date(isoDate(start)+'T00:00:00Z') && d <= new Date(isoDate(end)+'T00:00:00Z');
+    }).length;
+    last8Weeks.push({ label:`${start.getMonth()+1}/${start.getDate()}`, count });
+  }
+  const maxW = Math.max(1, ...last8Weeks.map(w=>w.count));
+
+  root.innerHTML = `
+    <div class="page">
+      <div class="page-head"><div><h1>Progress</h1><p>Every skill, its status and how far along you are, plus completions over time.</p></div></div>
+
+      <div class="panel">
+        <div class="section-title"><h3>Skills completed — last 8 weeks</h3></div>
+        <div class="mini-bars" style="height:60px;">
+          ${last8Weeks.map(w=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+            <div class="bar" style="width:100%"><span style="height:${(w.count/maxW)*100}%"></span></div>
+            <div class="lbl">${w.label}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="panel" style="overflow:auto">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead><tr style="text-align:left; font-size:.76rem; color:var(--text-faint);">
+            <th style="padding:.4rem .3rem">Path</th><th style="padding:.4rem .3rem">Skill</th><th style="padding:.4rem .3rem">Level</th><th style="padding:.4rem .3rem">Est.</th><th style="padding:.4rem .3rem">Progress</th><th style="padding:.4rem .3rem">Status</th>
+          </tr></thead>
+          <tbody style="font-size:.86rem;">${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  root.querySelectorAll('tbody tr').forEach(tr=>{}); // rows are read-only here; edits happen in Roadmap/Skills
+}
+
+/* =====================================================================
+   RENDER: RESOURCES
+===================================================================== */
+let resourceFilters = { search:'', path:'All', status:'All', skill:'All', onlyFav:false };
+
+function renderResources(root){
+  const skillOpts = ['<option value="All">All skills</option>', ...state.skills.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`)].join('');
+  const pathOpts = ['<option>All</option>', ...PATH_NAMES.map(p=>`<option>${p}</option>`)].join('');
+  const recent = [...state.resources].filter(r=>r.lastOpenedAt).sort((a,b)=>b.lastOpenedAt.localeCompare(a.lastOpenedAt)).slice(0,5);
+
+  root.innerHTML = `
+    <div class="page">
+      <div class="page-head">
+        <div><h1>Resources</h1><p>Your personal library of courses, docs and practice material.</p></div>
+        <button class="btn btn-primary" id="addResourceBtn">${icon('plus')} Add resource</button>
+      </div>
+
+      ${recent.length ? `<div>
+        <div class="section-title"><h3>Recently opened</h3></div>
+        <div class="recent-strip">${recent.map(r=>`<div class="recent-chip"><span class="n">${escapeHtml(r.name)}</span><span class="t">${escapeHtml(r.category)}</span></div>`).join('')}</div>
+      </div>` : ''}
+
+      <div class="panel">
+        <div class="filter-row">
+          <div class="field search"><label>Search</label><input id="resSearch" placeholder="Search resources…" value="${escapeHtml(resourceFilters.search)}"/></div>
+          <div class="field"><label>Career path</label><select id="resFilterPath">${pathOpts}</select></div>
+          <div class="field"><label>Skill</label><select id="resFilterSkill"><option value="All">All skills</option>${state.skills.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select></div>
+          <div class="field"><label>Status</label><select id="resFilterStatus"><option>All</option>${STATUS.map(s=>`<option>${s}</option>`).join('')}</select></div>
+          <button class="btn ${resourceFilters.onlyFav?'btn-primary':''}" id="resFilterFav">${icon('bookmark')} Favorites</button>
+        </div>
+      </div>
+
+      <div id="resGrid" class="res-grid"></div>
+    </div>`;
+
+  document.getElementById('resFilterPath').value = resourceFilters.path;
+  document.getElementById('resFilterSkill').value = resourceFilters.skill;
+  document.getElementById('resFilterStatus').value = resourceFilters.status;
+
+  document.getElementById('resSearch').oninput = e=>{ resourceFilters.search = e.target.value; drawResourceGrid(); };
+  document.getElementById('resFilterPath').onchange = e=>{ resourceFilters.path = e.target.value; drawResourceGrid(); };
+  document.getElementById('resFilterSkill').onchange = e=>{ resourceFilters.skill = e.target.value; drawResourceGrid(); };
+  document.getElementById('resFilterStatus').onchange = e=>{ resourceFilters.status = e.target.value; drawResourceGrid(); };
+  document.getElementById('resFilterFav').onclick = ()=>{ resourceFilters.onlyFav = !resourceFilters.onlyFav; renderResources(root); };
+  document.getElementById('addResourceBtn').onclick = ()=>openResourceModal(null);
+
+  drawResourceGrid();
+}
+
+function drawResourceGrid(){
+  const grid = document.getElementById('resGrid');
+  if(!grid) return;
+  const f = resourceFilters;
+  const items = state.resources.filter(r=>{
+    if(f.path!=='All' && r.path!==f.path) return false;
+    if(f.skill!=='All' && r.skillId!==f.skill) return false;
+    if(f.status!=='All' && r.status!==f.status) return false;
+    if(f.onlyFav && !r.favorite) return false;
+    if(f.search && !(r.name+' '+r.category+' '+r.notes).toLowerCase().includes(f.search.toLowerCase())) return false;
+    return true;
+  });
+  if(!items.length){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><h4>No resources match</h4><p>Try clearing filters, or add a new resource to your library.</p><button class="btn btn-primary" id="emptyAddRes">Add resource</button></div>`;
+    document.getElementById('emptyAddRes').onclick = ()=>openResourceModal(null);
+    return;
+  }
+  grid.innerHTML = items.map(r=>{
+    const skill = skillById(r.skillId);
+    return `<div class="res-card">
+      <div class="res-card-top">
+        <h4>${escapeHtml(r.name)}</h4>
+        <button class="fav-btn ${r.favorite?'active':''}" data-fav="${r.id}" aria-label="Toggle favorite">${icon('star')}</button>
+      </div>
+      <div class="meta">${escapeHtml(r.category)} · ${escapeHtml(r.path)}${skill?` · ${escapeHtml(skill.name)}`:''}</div>
+      ${r.notes?`<div class="notes">${escapeHtml(r.notes)}</div>`:''}
+      <span class="tag ${r.status==='Completed'?'tag-accent':r.status==='In Progress'?'tag-amber':'tag-muted'}" style="width:fit-content">${r.status}</span>
+      <div class="res-actions">
+        <a class="btn btn-sm" href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer" data-open="${r.id}">Open ${icon('ext')}</a>
+        <button class="btn btn-sm" data-toggle="${r.id}">${r.status==='Completed'?'Mark in progress':'Mark complete'}</button>
+        <button class="btn btn-sm btn-ghost" data-edit="${r.id}">Edit</button>
+        <button class="btn btn-sm btn-ghost btn-danger" data-del="${r.id}">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>{
+    const r = state.resources.find(x=>x.id===b.dataset.fav); r.favorite = !r.favorite; saveState();
+  });
+  grid.querySelectorAll('[data-open]').forEach(a=>a.onclick=()=>{
+    const r = state.resources.find(x=>x.id===a.dataset.open); if(r){ r.lastOpenedAt = new Date().toISOString(); saveState({skip:true}); }
+  });
+  grid.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>{
+    const r = state.resources.find(x=>x.id===b.dataset.toggle); r.status = r.status==='Completed'?'In Progress':'Completed'; saveState();
+  });
+  grid.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openResourceModal(state.resources.find(x=>x.id===b.dataset.edit)));
+  grid.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    if(!confirm('Delete this resource?')) return;
+    state.resources = state.resources.filter(x=>x.id!==b.dataset.del); saveState(); showToast('Resource deleted.');
+  });
+}
+
+function openResourceModal(resource){
+  const overlay = document.getElementById('overlayRoot');
+  const isEdit = !!resource;
+  const skillOpts = ['<option value="">None</option>', ...state.skills.map(s=>`<option value="${s.id}" ${resource&&resource.skillId===s.id?'selected':''}>${escapeHtml(s.name)}</option>`)].join('');
+  overlay.innerHTML = `
+    <div class="modal-overlay" id="resModalOverlay">
+      <div class="modal">
+        <div class="modal-head"><h3>${isEdit?'Edit resource':'Add resource'}</h3><button class="icon-btn" id="resModalClose">${icon('close')}</button></div>
+        <div class="grid g2">
+          <div class="field"><label>Name</label><input id="mResName" value="${escapeHtml(resource?.name||'')}" required/></div>
+          <div class="field"><label>URL</label><input id="mResUrl" type="url" placeholder="https://…" value="${escapeHtml(resource?.url||'')}" required/></div>
+        </div>
+        <div class="grid g2" style="margin-top:.6rem">
+          <div class="field"><label>Category</label><input id="mResCategory" placeholder="Course, docs, practice…" value="${escapeHtml(resource?.category||'')}" required/></div>
+          <div class="field"><label>Status</label><select id="mResStatus">${STATUS.map(s=>`<option ${resource&&resource.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        </div>
+        <div class="grid g2" style="margin-top:.6rem">
+          <div class="field"><label>Career path</label><select id="mResPath">${PATH_NAMES.map(p=>`<option ${resource&&resource.path===p?'selected':''}>${p}</option>`).join('')}</select></div>
+          <div class="field"><label>Related skill</label><select id="mResSkill">${skillOpts}</select></div>
+        </div>
+        <div class="field" style="margin-top:.6rem"><label>Notes</label><textarea id="mResNotes">${escapeHtml(resource?.notes||'')}</textarea></div>
+        <div style="margin-top:1rem; display:flex; gap:.5rem;">
+          <button class="btn btn-primary" id="mResSave">${isEdit?'Save changes':'Add resource'}</button>
+          <button class="btn btn-ghost" id="mResCancel">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+  const close = ()=>closeOverlay();
+  document.getElementById('resModalClose').onclick = close;
+  document.getElementById('mResCancel').onclick = close;
+  document.getElementById('resModalOverlay').addEventListener('click', e=>{ if(e.target.id==='resModalOverlay') close(); });
+  document.getElementById('mResSave').onclick = ()=>{
+    const name = document.getElementById('mResName').value.trim();
+    const url = document.getElementById('mResUrl').value.trim();
+    const category = document.getElementById('mResCategory').value.trim();
+    if(!name || !url || !category) return showToast('Please fill in name, URL and category.');
+    if(!/^https?:\/\//i.test(url)) return showToast('Resource URL must start with http:// or https://');
+    const payload = {
+      id: resource?.id || uid(), name, url, category,
+      status: document.getElementById('mResStatus').value,
+      path: document.getElementById('mResPath').value,
+      skillId: document.getElementById('mResSkill').value,
+      notes: document.getElementById('mResNotes').value.trim(),
+      favorite: resource?.favorite || false,
+      lastOpenedAt: resource?.lastOpenedAt || null
+    };
+    if(isEdit){ const idx = state.resources.findIndex(r=>r.id===resource.id); state.resources[idx] = payload; }
+    else state.resources.unshift(payload);
+    close(); saveState(); showToast(isEdit?'Resource updated.':'Resource added.');
+  };
+}
+
+/* =====================================================================
+   RENDER: SKILLS
+===================================================================== */
+let skillFilters = { search:'', path:'All', status:'All' };
+
+function renderSkills(root){
+  root.innerHTML = `
+    <div class="page">
+      <div class="page-head">
+        <div><h1>Skills</h1><p>Every skill across all paths, plus any custom skills you've added.</p></div>
+        <button class="btn btn-primary" id="addSkillBtn">${icon('plus')} Add skill</button>
+      </div>
+      <div class="panel">
+        <div class="filter-row">
+          <div class="field search"><label>Search</label><input id="skillSearch" placeholder="Search skills…" value="${escapeHtml(skillFilters.search)}"/></div>
+          <div class="field"><label>Career path</label><select id="skillFilterPath"><option>All</option>${PATH_NAMES.map(p=>`<option>${p}</option>`).join('')}</select></div>
+          <div class="field"><label>Status</label><select id="skillFilterStatus"><option>All</option>${STATUS.map(s=>`<option>${s}</option>`).join('')}</select></div>
+        </div>
+      </div>
+      <div id="skillList" class="grid" style="gap:.7rem"></div>
+    </div>`;
+  document.getElementById('skillFilterPath').value = skillFilters.path;
+  document.getElementById('skillFilterStatus').value = skillFilters.status;
+  document.getElementById('skillSearch').oninput = e=>{ skillFilters.search=e.target.value; drawSkillList(); };
+  document.getElementById('skillFilterPath').onchange = e=>{ skillFilters.path=e.target.value; drawSkillList(); };
+  document.getElementById('skillFilterStatus').onchange = e=>{ skillFilters.status=e.target.value; drawSkillList(); };
+  document.getElementById('addSkillBtn').onclick = ()=>openSkillModal(null);
+  drawSkillList();
+}
+
+function drawSkillList(){
+  const list = document.getElementById('skillList');
+  if(!list) return;
+  const f = skillFilters;
+  const items = [...state.skills].filter(s=>{
+    if(f.path!=='All' && s.path!==f.path) return false;
+    if(f.status!=='All' && s.status!==f.status) return false;
+    if(f.search && !s.name.toLowerCase().includes(f.search.toLowerCase())) return false;
+    return true;
+  }).sort((a,b)=>a.path.localeCompare(b.path)||a.order-b.order);
+
+  if(!items.length){
+    list.innerHTML = `<div class="empty"><h4>No skills match</h4><p>Adjust your filters or add a custom skill.</p></div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(s=>{
+    const last = lastStudiedDate(s.id);
+    return `<div class="skill-list-item">
+      <div class="top">
+        <div class="name-row">
+          ${s.isCustom?'<span class="custom-dot" title="Custom skill"></span>':''}
+          <strong>${escapeHtml(s.name)}</strong>
+          <span class="tag tag-muted">${escapeHtml(s.path)}</span>
+          <span class="tag ${s.status==='Completed'?'tag-accent':s.status==='In Progress'?'tag-amber':'tag-muted'}">${s.status}</span>
+        </div>
+        <div style="display:flex; gap:.35rem;">
+          <button class="btn btn-sm btn-ghost" data-edit-skill="${s.id}">Edit</button>
+          ${s.isCustom?`<button class="btn btn-sm btn-ghost btn-danger" data-del-skill="${s.id}">Delete</button>`:''}
+        </div>
+      </div>
+      <div class="node-sub">${s.level} · ~${s.estHours}h · deps: ${(s.deps||[]).map(d=>skillById(d)?.name||d).join(', ')||'none'}${last?` · last studied ${last}`:''}</div>
+      <div class="node-progress"><div class="progress-track"><div class="progress-fill" style="width:${skillProgressPct(s)}%"></div></div><span>${skillProgressPct(s)}%</span></div>
+      ${s.goal?`<div class="node-sub">Goal: ${escapeHtml(s.goal)}</div>`:''}
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('[data-edit-skill]').forEach(b=>b.onclick=()=>openSkillModal(skillById(b.dataset.editSkill)));
+  list.querySelectorAll('[data-del-skill]').forEach(b=>b.onclick=()=>{
+    if(!confirm('Delete this custom skill?')) return;
+    state.skills = state.skills.filter(s=>s.id!==b.dataset.delSkill);
+    state.resources = state.resources.map(r=>r.skillId===b.dataset.delSkill?{...r,skillId:''}:r);
+    saveState(); showToast('Skill deleted.');
+  });
+}
+
+function openSkillModal(skill){
+  const isEdit = !!skill;
+  const overlay = document.getElementById('overlayRoot');
+  overlay.innerHTML = `
+    <div class="modal-overlay" id="skillModalOverlay">
+      <div class="modal">
+        <div class="modal-head"><h3>${isEdit?'Edit skill':'Add custom skill'}</h3><button class="icon-btn" id="skillModalClose">${icon('close')}</button></div>
+        <div class="field"><label>Skill name</label><input id="mSkillName" value="${escapeHtml(skill?.name||'')}" required/></div>
+        <div class="grid g2" style="margin-top:.6rem">
+          <div class="field"><label>Career path</label><select id="mSkillPath">${PATH_NAMES.map(p=>`<option ${skill&&skill.path===p?'selected':''}>${p}</option>`).join('')}</select></div>
+          <div class="field"><label>Level</label><select id="mSkillLevel">${['Beginner','Intermediate','Advanced'].map(l=>`<option ${skill&&skill.level===l?'selected':''}>${l}</option>`).join('')}</select></div>
+        </div>
+        <div class="grid g2" style="margin-top:.6rem">
+          <div class="field"><label>Estimated hours</label><input id="mSkillHours" type="number" min="1" value="${skill?.estHours||10}"/></div>
+          <div class="field"><label>Status</label><select id="mSkillStatus">${STATUS.map(s=>`<option ${skill&&skill.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        </div>
+        <div class="field" style="margin-top:.6rem"><label>Goal</label><input id="mSkillGoal" value="${escapeHtml(skill?.goal||'')}"/></div>
+        <div class="field" style="margin-top:.6rem"><label>Notes</label><textarea id="mSkillNotes">${escapeHtml(skill?.notes||'')}</textarea></div>
+        <div style="margin-top:1rem; display:flex; gap:.5rem;">
+          <button class="btn btn-primary" id="mSkillSave">${isEdit?'Save changes':'Add skill'}</button>
+          <button class="btn btn-ghost" id="mSkillCancel">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+  const close = ()=>closeOverlay();
+  document.getElementById('skillModalClose').onclick = close;
+  document.getElementById('mSkillCancel').onclick = close;
+  document.getElementById('skillModalOverlay').addEventListener('click', e=>{ if(e.target.id==='skillModalOverlay') close(); });
+  document.getElementById('mSkillSave').onclick = ()=>{
+    const name = document.getElementById('mSkillName').value.trim();
+    if(!name) return showToast('Skill name is required.');
+    const payload = {
+      id: skill?.id || uid(), name,
+      path: document.getElementById('mSkillPath').value,
+      level: document.getElementById('mSkillLevel').value,
+      estHours: Math.max(1, Number(document.getElementById('mSkillHours').value||1)),
+      status: document.getElementById('mSkillStatus').value,
+      goal: document.getElementById('mSkillGoal').value.trim(),
+      notes: document.getElementById('mSkillNotes').value.trim(),
+      deps: skill?.deps || [], resources: skill?.resources || [], order: skill?.order || 999,
+      isCustom: true, completedAt: skill?.completedAt || null
+    };
+    if(payload.status==='Completed' && !payload.completedAt) payload.completedAt = isoDate(new Date());
+    if(isEdit){ const idx = state.skills.findIndex(s=>s.id===skill.id); state.skills[idx] = { ...state.skills[idx], ...payload, isCustom: state.skills[idx].isCustom || true }; }
+    else state.skills.push(payload);
+    close(); saveState(); showToast(isEdit?'Skill updated.':'Skill added.');
+  };
+}
+
+/* =====================================================================
+   RENDER: ACTIVITY / ANALYTICS
+===================================================================== */
+function renderActivity(root){
+  const today = isoDate(new Date());
+  const { current, longest } = getStreaks();
+  const best = bestLearningDay();
+  const weekHours = hoursInLastNDays(7);
+  const weekTarget = Number(state.settings.weeklyHoursTarget)||1;
+  const weekPct = clamp(Math.round((weekHours/weekTarget)*100),0,100);
+  const skillsThisWeek = skillsCompletedInLastNDays(7);
+  const skillsTarget = Number(state.settings.weeklySkillsTarget)||1;
+
+  root.innerHTML = `
+    <div class="page">
+      <div class="page-head"><div><h1>Activity & analytics</h1><p>Log your sessions and see how consistent you've been.</p></div></div>
+
+      <div class="grid g4">
+        <div class="panel stat-card"><div class="val">${Number(state.activity[today]?.hours||0)}h</div><div class="lbl">Today</div></div>
+        <div class="panel stat-card"><div class="val">${weekHours.toFixed(1)}h</div><div class="lbl">This week</div></div>
+        <div class="panel stat-card"><div class="val">${hoursThisMonth().toFixed(1)}h</div><div class="lbl">This month</div></div>
+        <div class="panel stat-card"><div class="val">${totalHours().toFixed(1)}h</div><div class="lbl">All time</div></div>
+      </div>
+      <div class="grid g4">
+        <div class="panel stat-card"><div class="val">${activeDaysCount()}</div><div class="lbl">Active days</div></div>
+        <div class="panel stat-card"><div class="val">${current}</div><div class="lbl">Current streak</div></div>
+        <div class="panel stat-card"><div class="val">${longest}</div><div class="lbl">Longest streak</div></div>
+        <div class="panel stat-card"><div class="val">${consistencyPct()}%</div><div class="lbl">Consistency since start</div></div>
+      </div>
+
+      <div class="grid g2">
+        <div class="panel">
+          <form id="activityForm">
+            <div class="grid g3">
+              <div class="field"><label>Date</label><input id="actDate" type="date" value="${today}" required/></div>
+              <div class="field"><label>Hours</label><input id="actHours" type="number" step="0.25" min="0" value="1" required/></div>
+              <div class="field"><label>Skill (optional)</label><select id="actSkill"><option value="">General</option>${state.skills.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select></div>
+            </div>
+            <div class="field" style="margin-top:.6rem"><label>Notes</label><input id="actNote" placeholder="What did you learn today?"/></div>
+            <div style="display:flex; gap:.5rem; margin-top:.7rem;">
+              <button class="btn btn-primary" type="submit">Log activity</button>
+              <button class="btn btn-ghost" type="button" id="actDelete">Delete entry for date</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel weekly-goal-card">
+          <div class="section-title"><h3>Weekly goal</h3></div>
+          <div class="wg-row"><span>Hours</span><span class="amt">${weekHours.toFixed(1)} / ${weekTarget}h</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:${weekPct}%"></div></div>
+          <div class="wg-row" style="margin-top:.4rem"><span>Skills completed</span><span class="amt">${skillsThisWeek} / ${skillsTarget}</span></div>
+          <div class="progress-track"><div class="progress-fill amber" style="width:${clamp((skillsThisWeek/skillsTarget)*100,0,100)}%"></div></div>
+          ${weekPct>=100 ? `<div class="node-sub" style="color:var(--accent)">Weekly hours goal reached — nice consistency.</div>` : ''}
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title"><h3>Contribution heatmap</h3><span class="node-sub">Last 20 weeks · best day: ${best?`${best[0]} (${Number(best[1].hours).toFixed(1)}h)`:'—'}</span></div>
+        <div class="heat-wrap"><div class="heatmap" id="heatmap"></div></div>
+        <div class="heat-scale"><span>Less</span><div class="cell"></div><div class="cell lvl1"></div><div class="cell lvl2"></div><div class="cell lvl3"></div><div class="cell lvl4"></div><span>More</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title"><h3>Recent activity</h3></div>
+        ${renderActivityFeed(14)}
+      </div>
+    </div>`;
+
+  const heat = document.getElementById('heatmap');
+  const days = 140; const start = new Date(); start.setDate(start.getDate()-(days-1));
+  let html='';
+  for(let i=0;i<days;i++){
+    const d = new Date(start); d.setDate(start.getDate()+i);
+    const key = isoDate(d); const hours = Number(state.activity[key]?.hours||0);
+    const lvl = hours===0?0:hours<1?1:hours<2?2:hours<4?3:4;
+    html += `<div class="cell ${lvl?'lvl'+lvl:''}" title="${key}: ${hours}h"></div>`;
+  }
+  heat.innerHTML = html;
+
+  document.getElementById('activityForm').onsubmit = e=>{
+    e.preventDefault();
+    const date = document.getElementById('actDate').value;
+    const hours = Number(document.getElementById('actHours').value||0);
+    if(!date) return showToast('Date is required.');
+    if(hours<0) return showToast('Hours cannot be negative.');
+    const skillId = document.getElementById('actSkill').value;
+    const note = document.getElementById('actNote').value.trim();
+    const prevStreakLongest = getStreaks().longest;
+    state.activity[date] = { hours, skillId, note, topic: skillId ? (skillById(skillId)?.name||'') : '' };
+    if(skillId){ const sk = skillById(skillId); if(sk && sk.status==='Not Started') sk.status='In Progress'; }
+    saveState();
+    if(date===today){ const numEl=document.getElementById('streakNum'); if(numEl) numEl.classList.add('pulse'); }
+    showToast('Activity logged.');
+  };
+  document.getElementById('actDelete').onclick = ()=>{
+    const date = document.getElementById('actDate').value;
+    if(!date || !state.activity[date]) return showToast('No entry for that date.');
+    delete state.activity[date]; saveState(); showToast('Entry removed.');
+  };
+}
+
+/* =====================================================================
+   RENDER: GOALS & NOTES
+===================================================================== */
+function renderGoals(root){
+  root.innerHTML = `
+    <div class="page">
+      <div class="page-head"><div><h1>Goals & notes</h1><p>Your reflections, targets, and the milestones you've earned along the way.</p></div></div>
+
+      <div class="grid g2">
+        <div class="panel">
+          <label>Long-form notes</label>
+          <textarea id="notesInput" style="min-height:140px" placeholder="Weekly reflection, blockers, key takeaways…">${escapeHtml(state.notes)}</textarea>
+        </div>
+        <div class="panel">
+          <label>Main career goal</label>
+          <textarea id="goalsInput" style="min-height:140px" placeholder="e.g. Become interview-ready for a Data Analyst role in 4 months">${escapeHtml(state.goals)}</textarea>
+        </div>
+      </div>
+      <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+        <button class="btn btn-primary" id="saveNotesBtn">Save notes & goal</button>
+        <button class="btn" id="exportBtn">Export JSON</button>
+        <label class="btn" style="cursor:pointer;">Import JSON<input id="importFile" type="file" accept="application/json" style="display:none"></label>
+        <button class="btn btn-ghost btn-danger" id="resetBtn">Reset all data</button>
+      </div>
+
+      <div class="panel">
+        <div class="section-title"><h3>Milestones & achievements</h3></div>
+        <div class="grid g3" id="achievementGrid"></div>
+      </div>
+    </div>`;
+
+  document.getElementById('saveNotesBtn').onclick = ()=>{
+    state.notes = document.getElementById('notesInput').value;
+    state.goals = document.getElementById('goalsInput').value;
+    saveState(); showToast('Saved notes and goal.');
+  };
+  document.getElementById('exportBtn').onclick = ()=>{
+    const blob = new Blob([JSON.stringify(state,null,2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='pathwise-dashboard-backup.json'; a.click();
+    URL.revokeObjectURL(url);
+  };
+  document.getElementById('importFile').onchange = e=>{
+    const file = e.target.files?.[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{ state = mergeState(JSON.parse(String(reader.result||'{}'))); saveState(); showToast('Import successful.'); }
+      catch{ showToast('Invalid JSON import file.'); }
+    };
+    reader.readAsText(file);
+  };
+  document.getElementById('resetBtn').onclick = ()=>{
+    if(!confirm('Reset all data to the starting catalog? This clears activity, notes and custom edits.')) return;
+    state = defaultState(); saveState(); showToast('Data reset.');
+  };
+
+  const grid = document.getElementById('achievementGrid');
+  grid.innerHTML = ACHIEVEMENTS.map(a=>{
+    const done = a.test(state);
+    const [cur,tgt] = a.progress(state);
+    return `<div class="panel panel-tight" style="display:flex; gap:.7rem; align-items:flex-start; ${done?'border-color:var(--accent)':''}">
+      <div style="width:34px;height:34px;border-radius:999px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${done?'var(--accent-soft)':'var(--surface-2)'};color:${done?'var(--accent)':'var(--text-faint)'}">${icon(done?'check':'lock')}</div>
+      <div>
+        <div style="font-weight:600; font-size:.9rem;">${escapeHtml(a.name)}</div>
+        <div class="node-sub">${escapeHtml(a.desc)}</div>
+        ${!done?`<div class="node-sub mono">${cur} / ${tgt}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* =====================================================================
+   SETTINGS MODAL
+===================================================================== */
+function openSettingsModal(){
+  const overlay = document.getElementById('overlayRoot');
+  const s = state.settings;
+  overlay.innerHTML = `
+    <div class="modal-overlay" id="settingsOverlay">
+      <div class="modal">
+        <div class="modal-head"><h3>Settings</h3><button class="icon-btn" id="settingsClose">${icon('close')}</button></div>
+        <div class="field"><label>Name</label><input id="setName" value="${escapeHtml(s.name)}" placeholder="How should we greet you?"/></div>
+        <div class="grid g2" style="margin-top:.6rem">
+          <div class="field"><label>Primary career path</label><select id="setPrimary"><option value="">None yet</option>${PATH_NAMES.map(p=>`<option ${s.primaryPath===p?'selected':''}>${p}</option>`).join('')}</select></div>
+          <div class="field"><label>Theme</label><select id="setTheme">
+            <option value="dark" ${s.theme==='dark'?'selected':''}>Dark</option>
+            <option value="light" ${s.theme==='light'?'selected':''}>Light</option>
+            <option value="system" ${s.theme==='system'?'selected':''}>Match system</option>
+          </select></div>
+        </div>
+        <div class="grid g2" style="margin-top:.6rem">
+          <div class="field"><label>Weekly hours target</label><input id="setWeekly" type="number" min="1" value="${s.weeklyHoursTarget}"/></div>
+          <div class="field"><label>Weekly skills target</label><input id="setWeeklySkills" type="number" min="1" value="${s.weeklySkillsTarget}"/></div>
+        </div>
+        <div class="grid g2" style="margin-top:.6rem">
+          <div class="field"><label>Daily hours target</label><input id="setDaily" type="number" min="0" step="0.25" value="${s.dailyHoursTarget}"/></div>
+          <div class="field"><label>Journey start date</label><input id="setStart" type="date" value="${s.startDate}"/></div>
+        </div>
+        <div class="field" style="margin-top:.6rem"><label>Career goal</label><textarea id="setGoal">${escapeHtml(s.careerGoal)}</textarea></div>
+        <div style="margin-top:1rem; display:flex; gap:.5rem;">
+          <button class="btn btn-primary" id="settingsSave">Save settings</button>
+          <button class="btn btn-ghost" id="settingsCancel">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+  const close = ()=>closeOverlay();
+  document.getElementById('settingsClose').onclick = close;
+  document.getElementById('settingsCancel').onclick = close;
+  document.getElementById('settingsOverlay').addEventListener('click', e=>{ if(e.target.id==='settingsOverlay') close(); });
+  document.getElementById('settingsSave').onclick = ()=>{
+    state.settings = {
+      ...state.settings,
+      name: document.getElementById('setName').value.trim(),
+      primaryPath: document.getElementById('setPrimary').value,
+      theme: document.getElementById('setTheme').value,
+      weeklyHoursTarget: Math.max(1, Number(document.getElementById('setWeekly').value||1)),
+      weeklySkillsTarget: Math.max(1, Number(document.getElementById('setWeeklySkills').value||1)),
+      dailyHoursTarget: Math.max(0, Number(document.getElementById('setDaily').value||0)),
+      startDate: document.getElementById('setStart').value || s.startDate,
+      careerGoal: document.getElementById('setGoal').value.trim()
+    };
+    close(); saveState(); showToast('Settings saved.');
+  };
+}
+
+/* =====================================================================
+   COMMAND PALETTE
+===================================================================== */
+function buildCommandIndex(query){
+  const q = query.trim().toLowerCase();
+  const results = [];
+  if(!q){
+    return [
+      ...SECTIONS.map(s=>({ type:'Section', label:s.label, action:()=>{ currentSection=s.id; renderApp(); } }))
+    ];
+  }
+  state.skills.forEach(s=>{ if(s.name.toLowerCase().includes(q)) results.push({ type:'Skill', label:s.name, sub:s.path, action:()=>{ currentSection='roadmap'; roadmapActivePath=s.path; renderApp(()=>openSkillDetail(s.id)); } }); });
+  state.resources.forEach(r=>{ if((r.name+' '+r.category).toLowerCase().includes(q)) results.push({ type:'Resource', label:r.name, sub:r.category, action:()=>{ currentSection='resources'; resourceFilters={search:r.name,path:'All',status:'All',skill:'All',onlyFav:false}; renderApp(); } }); });
+  PATH_NAMES.forEach(p=>{ if(p.toLowerCase().includes(q)) results.push({ type:'Career path', label:p, action:()=>{ currentSection='paths'; renderApp(); } }); });
+  if('notes'.includes(q) || (state.notes||'').toLowerCase().includes(q)) results.push({ type:'Notes', label:'Your notes', action:()=>{ currentSection='goals'; renderApp(); } });
+  if('goals'.includes(q) || (state.goals||'').toLowerCase().includes(q)) results.push({ type:'Goal', label:'Your career goal', action:()=>{ currentSection='goals'; renderApp(); } });
+  return results.slice(0,20);
+}
+
+function openCommandPalette(){
+  const overlay = document.getElementById('overlayRoot');
+  cmdkIndex = 0;
+  overlay.innerHTML = `
+    <div class="cmdk-overlay" id="cmdkOverlay">
+      <div class="cmdk">
+        <input id="cmdkInput" placeholder="Search skills, resources, paths, notes…" autofocus />
+        <div class="cmdk-results" id="cmdkResults"></div>
+      </div>
+    </div>`;
+  const input = document.getElementById('cmdkInput');
+  const resultsEl = document.getElementById('cmdkResults');
+  let results = [];
+
+  function draw(){
+    results = buildCommandIndex(input.value);
+    if(!results.length){ resultsEl.innerHTML = `<div class="cmdk-empty">No matches. Try a different search.</div>`; return; }
+    resultsEl.innerHTML = results.map((r,i)=>`<div class="cmdk-item ${i===cmdkIndex?'sel':''}" data-idx="${i}"><span>${escapeHtml(r.label)}${r.sub?` <span class="node-sub" style="display:inline">· ${escapeHtml(r.sub)}</span>`:''}</span><span class="k-type">${escapeHtml(r.type)}</span></div>`).join('');
+    resultsEl.querySelectorAll('[data-idx]').forEach(el=>el.onclick = ()=>{ results[Number(el.dataset.idx)].action(); closeOverlay(); });
+  }
+  draw();
+  input.oninput = ()=>{ cmdkIndex=0; draw(); };
+  input.onkeydown = e=>{
+    if(e.key==='ArrowDown'){ e.preventDefault(); cmdkIndex = Math.min(results.length-1, cmdkIndex+1); draw(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); cmdkIndex = Math.max(0, cmdkIndex-1); draw(); }
+    else if(e.key==='Enter'){ e.preventDefault(); if(results[cmdkIndex]){ results[cmdkIndex].action(); closeOverlay(); } }
+    else if(e.key==='Escape'){ closeOverlay(); }
+  };
+  document.getElementById('cmdkOverlay').addEventListener('click', e=>{ if(e.target.id==='cmdkOverlay') closeOverlay(); });
+  setTimeout(()=>input.focus(), 30);
+}
+
+document.addEventListener('keydown', e=>{
+  if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); openCommandPalette(); }
+  else if(e.key==='Escape'){ const ov=document.getElementById('overlayRoot'); if(ov.innerHTML) closeOverlay(); }
+});
+
+/* =====================================================================
+   APP RENDER ROOT
+===================================================================== */
+function renderApp(after){
+  renderShell();
+  const root = document.getElementById('pageRoot');
+  ({
+    dashboard: renderDashboard,
+    paths: renderPaths,
+    roadmap: renderRoadmap,
+    progress: renderProgress,
+    resources: renderResources,
+    skills: renderSkills,
+    activity: renderActivity,
+    goals: renderGoals
+  }[currentSection] || renderDashboard)(root);
+  if(typeof after === 'function') setTimeout(after, 20);
+}
+
+applyTheme();
+renderApp();
+</script>
+</body>
+</html>
