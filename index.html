@@ -1,0 +1,1091 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Career Learning Dashboard</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a2f;
+      --panel-alt: #0f1729;
+      --text: #e8eefc;
+      --muted: #97a7d1;
+      --accent: #4f8cff;
+      --success: #23b26d;
+      --warn: #f3b22b;
+      --danger: #e25555;
+      --border: #253253;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: linear-gradient(180deg, #080d1a, #0b1020 22%, #0d1426);
+      color: var(--text);
+    }
+
+    a { color: #9cc0ff; }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 13, 26, 0.92);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.8rem 1rem;
+    }
+
+    .top {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    nav button {
+      border: 1px solid var(--border);
+      background: #0e1630;
+      color: var(--text);
+      padding: 0.45rem 0.7rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    nav button.active {
+      background: var(--accent);
+      border-color: transparent;
+      color: white;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .hidden { display: none !important; }
+
+    .grid { display: grid; gap: 0.8rem; }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .card {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem;
+    }
+
+    .label { font-size: 0.8rem; color: var(--muted); }
+    .metric { font-size: 1.4rem; font-weight: 700; margin-top: 0.1rem; }
+
+    .bar {
+      height: 10px;
+      background: #0a1328;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 0.45rem;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #3f78ff, #62c3ff);
+    }
+
+    .row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    label { font-size: 0.86rem; color: var(--muted); }
+
+    input, select, textarea, button {
+      font: inherit;
+      border-radius: 8px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: #0b1429;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.55rem;
+    }
+
+    textarea { min-height: 70px; resize: vertical; }
+
+    button.action {
+      border: 1px solid var(--border);
+      background: #172447;
+      color: var(--text);
+      padding: 0.48rem 0.7rem;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: transparent;
+      color: white;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 0.16rem 0.48rem;
+      font-size: 0.75rem;
+      border: 1px solid var(--border);
+      background: #122043;
+      color: var(--muted);
+      margin-right: 0.2rem;
+    }
+
+    .status-not-started { color: #b8c5e5; }
+    .status-in-progress { color: var(--warn); }
+    .status-completed { color: var(--success); }
+
+    .skill-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.8rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .skill-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+    .list {
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .heatmap {
+      display: grid;
+      grid-template-rows: repeat(7, 12px);
+      grid-auto-flow: column;
+      grid-auto-columns: 12px;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 0.4rem;
+    }
+
+    .cell {
+      border-radius: 3px;
+      border: 1px solid #213257;
+      background: #0a1428;
+      min-width: 12px;
+      min-height: 12px;
+    }
+
+    .lvl1 { background: #173862; }
+    .lvl2 { background: #1e5b97; }
+    .lvl3 { background: #2375bd; }
+    .lvl4 { background: #2c9bf5; }
+
+    .danger { color: var(--danger); }
+    .ok { color: var(--success); }
+    .muted { color: var(--muted); font-size: 0.85rem; }
+
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td {
+      border-bottom: 1px solid var(--border);
+      padding: 0.45rem 0.3rem;
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.9rem;
+    }
+
+    .toast {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      background: #0f1b36;
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      max-width: 320px;
+      z-index: 150;
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .grid-4, .grid-3 { grid-template-columns: 1fr; }
+      header { position: static; }
+      h1 { font-size: 1rem; }
+      nav button { font-size: 0.78rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="top">
+      <h1>Data Career Learning Dashboard</h1>
+      <nav id="nav"></nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="storageNotice" class="hidden"></section>
+
+    <section id="overviewSection" data-section="Overview"></section>
+    <section id="careerSection" data-section="Career Paths" class="hidden"></section>
+    <section id="roadmapSection" data-section="Roadmap" class="hidden"></section>
+    <section id="progressSection" data-section="My Progress" class="hidden"></section>
+    <section id="resourcesSection" data-section="Resources" class="hidden"></section>
+    <section id="skillsSection" data-section="Skills" class="hidden"></section>
+    <section id="activitySection" data-section="Streak/Activity" class="hidden"></section>
+    <section id="notesSection" data-section="Notes/Goals" class="hidden"></section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = 'dataCareerDashboardV1';
+    const STATUS_OPTIONS = ['Not Started', 'In Progress', 'Completed'];
+    const SECTIONS = ['Overview', 'Career Paths', 'Roadmap', 'My Progress', 'Resources', 'Skills', 'Streak/Activity', 'Notes/Goals'];
+
+    const PATHS = {
+      'Data Analyst': 'Transforms data into business insights using SQL, BI, spreadsheets, and storytelling.',
+      'Data Scientist': 'Builds predictive models and experiments with statistics, ML, and communication.',
+      'Data Engineer': 'Designs data pipelines, storage, and reliable data platforms for analytics and ML.',
+      'Analytics Engineer': 'Models trusted analytics datasets, metrics layers, and semantic transformations.',
+      'ML Engineer': 'Productionizes models with deployment, monitoring, and MLOps workflows.'
+    };
+
+    const seedSkills = [
+      { id: 'sql-foundations', name: 'SQL Foundations', path: 'Data Analyst', level: 'Beginner', estHours: 25, deps: [], resources: [{title:'SQLBolt',url:'https://sqlbolt.com/'},{title:'Mode SQL Tutorial',url:'https://mode.com/sql-tutorial/'}], order: 1 },
+      { id: 'excel-analysis', name: 'Excel & Spreadsheets', path: 'Data Analyst', level: 'Beginner', estHours: 20, deps: [], resources: [{title:'ExcelIsFun',url:'https://www.youtube.com/user/ExcelIsFun'}], order: 2 },
+      { id: 'data-visualization', name: 'Data Visualization (Tableau/Power BI)', path: 'Data Analyst', level: 'Intermediate', estHours: 30, deps: ['sql-foundations'], resources: [{title:'Microsoft Power BI Learning',url:'https://learn.microsoft.com/en-us/training/powerplatform/power-bi/'},{title:'Tableau Free Training',url:'https://www.tableau.com/learn/training'}], order: 3 },
+      { id: 'ab-testing', name: 'A/B Testing & Experimentation', path: 'Data Analyst', level: 'Advanced', estHours: 22, deps: ['data-visualization'], resources: [{title:'Khan Academy Statistics',url:'https://www.khanacademy.org/math/statistics-probability'}], order: 4 },
+
+      { id: 'python-basics', name: 'Python for Data Work', path: 'Data Scientist', level: 'Beginner', estHours: 35, deps: [], resources: [{title:'Python Data Science Handbook',url:'https://jakevdp.github.io/PythonDataScienceHandbook/'},{title:'freeCodeCamp Python',url:'https://www.freecodecamp.org/learn/scientific-computing-with-python/'}], order: 1 },
+      { id: 'stats-prob', name: 'Statistics & Probability', path: 'Data Scientist', level: 'Beginner', estHours: 40, deps: [], resources: [{title:'OpenIntro Statistics',url:'https://www.openintro.org/book/os/'}], order: 2 },
+      { id: 'ml-fundamentals', name: 'Machine Learning Fundamentals', path: 'Data Scientist', level: 'Intermediate', estHours: 50, deps: ['python-basics', 'stats-prob'], resources: [{title:'Hands-On ML (samples)',url:'https://github.com/ageron/handson-ml3'},{title:'Google ML Crash Course',url:'https://developers.google.com/machine-learning/crash-course'}], order: 3 },
+      { id: 'model-evaluation', name: 'Model Evaluation & Explainability', path: 'Data Scientist', level: 'Advanced', estHours: 28, deps: ['ml-fundamentals'], resources: [{title:'Interpretable ML',url:'https://christophm.github.io/interpretable-ml-book/'}], order: 4 },
+
+      { id: 'python-etl', name: 'Python ETL Scripting', path: 'Data Engineer', level: 'Beginner', estHours: 30, deps: [], resources: [{title:'Real Python ETL',url:'https://realpython.com/python-data-cleaning-numpy-pandas/'}], order: 1 },
+      { id: 'data-warehousing', name: 'Data Warehousing Concepts', path: 'Data Engineer', level: 'Intermediate', estHours: 35, deps: ['python-etl'], resources: [{title:'Kimball Group Articles',url:'https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/'}], order: 2 },
+      { id: 'orchestration', name: 'Workflow Orchestration (Airflow)', path: 'Data Engineer', level: 'Intermediate', estHours: 30, deps: ['python-etl'], resources: [{title:'Apache Airflow Docs',url:'https://airflow.apache.org/docs/'}], order: 3 },
+      { id: 'streaming', name: 'Streaming Data (Kafka Basics)', path: 'Data Engineer', level: 'Advanced', estHours: 26, deps: ['data-warehousing'], resources: [{title:'Confluent Kafka 101',url:'https://developer.confluent.io/learn-kafka/'}], order: 4 },
+
+      { id: 'dbt-basics', name: 'dbt Fundamentals', path: 'Analytics Engineer', level: 'Beginner', estHours: 24, deps: ['sql-foundations'], resources: [{title:'dbt Learn',url:'https://learn.getdbt.com/'}], order: 1 },
+      { id: 'dimensional-modeling', name: 'Dimensional Modeling', path: 'Analytics Engineer', level: 'Intermediate', estHours: 30, deps: ['dbt-basics'], resources: [{title:'The Data Warehouse Toolkit notes',url:'https://www.kimballgroup.com/' }], order: 2 },
+      { id: 'metrics-layer', name: 'Metrics Layer & Semantic Models', path: 'Analytics Engineer', level: 'Advanced', estHours: 28, deps: ['dimensional-modeling'], resources: [{title:'Transform blog',url:'https://www.getdbt.com/blog'}], order: 3 },
+
+      { id: 'software-eng', name: 'Software Engineering for ML', path: 'ML Engineer', level: 'Intermediate', estHours: 30, deps: ['python-basics'], resources: [{title:'Full Stack Deep Learning',url:'https://fullstackdeeplearning.com/'}], order: 1 },
+      { id: 'model-deploy', name: 'Model Deployment APIs', path: 'ML Engineer', level: 'Advanced', estHours: 35, deps: ['ml-fundamentals', 'software-eng'], resources: [{title:'FastAPI Docs',url:'https://fastapi.tiangolo.com/'}], order: 2 },
+      { id: 'mlops-monitoring', name: 'MLOps Monitoring & Drift', path: 'ML Engineer', level: 'Advanced', estHours: 26, deps: ['model-deploy'], resources: [{title:'Made With ML Ops',url:'https://madewithml.com/'}], order: 3 }
+    ].map(skill => ({ ...skill, status: 'Not Started', notes: '', goal: '', isCustom: false }));
+
+    const seedResources = [
+      { id: uid(), name: 'Kaggle Learn', url: 'https://www.kaggle.com/learn', category: 'Practice', notes: 'Short applied courses', status: 'Not Started', path: 'Data Scientist', skillId: 'python-basics' },
+      { id: uid(), name: 'DataTalksClub Zoomcamps', url: 'https://github.com/DataTalksClub', category: 'Bootcamp', notes: 'Data engineering and ML cohorts', status: 'Not Started', path: 'Data Engineer', skillId: 'python-etl' }
+    ];
+
+    const defaultState = () => ({
+      skills: JSON.parse(JSON.stringify(seedSkills)),
+      resources: JSON.parse(JSON.stringify(seedResources)),
+      activity: {},
+      notes: '',
+      goals: ''
+    });
+
+    const storage = (() => {
+      try {
+        const key = '__dash_test__';
+        localStorage.setItem(key, '1');
+        localStorage.removeItem(key);
+        return {
+          available: true,
+          read() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return defaultState();
+            return mergeState(JSON.parse(raw));
+          },
+          write(state) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          }
+        };
+      } catch {
+        let memory = defaultState();
+        return {
+          available: false,
+          read() { return memory; },
+          write(state) { memory = state; }
+        };
+      }
+    })();
+
+    let state = storage.read();
+
+    function mergeState(raw) {
+      const base = defaultState();
+      if (!raw || typeof raw !== 'object') return base;
+      const map = new Map(base.skills.map(s => [s.id, s]));
+      (raw.skills || []).forEach(s => {
+        if (!s || !s.id) return;
+        if (map.has(s.id)) map.set(s.id, { ...map.get(s.id), ...s, isCustom: !!s.isCustom });
+        else map.set(s.id, {
+          id: s.id,
+          name: s.name || 'Custom Skill',
+          path: s.path || 'Data Analyst',
+          level: s.level || 'Beginner',
+          estHours: Number(s.estHours) || 0,
+          deps: Array.isArray(s.deps) ? s.deps : [],
+          resources: Array.isArray(s.resources) ? s.resources : [],
+          order: Number(s.order) || 99,
+          status: STATUS_OPTIONS.includes(s.status) ? s.status : 'Not Started',
+          notes: s.notes || '',
+          goal: s.goal || '',
+          isCustom: true
+        });
+      });
+      return {
+        skills: Array.from(map.values()),
+        resources: Array.isArray(raw.resources) ? raw.resources.map(r => ({
+          id: r.id || uid(),
+          name: r.name || 'Untitled',
+          url: r.url || '',
+          category: r.category || 'General',
+          notes: r.notes || '',
+          status: STATUS_OPTIONS.includes(r.status) ? r.status : 'Not Started',
+          path: r.path || 'Data Analyst',
+          skillId: r.skillId || ''
+        })) : base.resources,
+        activity: raw.activity && typeof raw.activity === 'object' ? raw.activity : {},
+        notes: typeof raw.notes === 'string' ? raw.notes : '',
+        goals: typeof raw.goals === 'string' ? raw.goals : ''
+      };
+    }
+
+    function saveState() {
+      try {
+        storage.write(state);
+      } catch {
+        showToast('Could not save changes. Storage may be unavailable.');
+      }
+      renderAll();
+    }
+
+    function uid() { return Math.random().toString(36).slice(2, 10); }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => t.style.display = 'none', 2400);
+    }
+
+    function statusWeight(status) {
+      if (status === 'Completed') return 1;
+      if (status === 'In Progress') return 0.5;
+      return 0;
+    }
+
+    function percent(value) { return `${Math.round(value)}%`; }
+
+    function getActivityHours() {
+      return Object.values(state.activity).reduce((sum, day) => sum + Number(day.hours || 0), 0);
+    }
+
+    function getStreaks() {
+      const days = Object.keys(state.activity)
+        .filter(d => Number(state.activity[d]?.hours || 0) > 0)
+        .sort();
+      let current = 0;
+      let longest = 0;
+      if (!days.length) return { current, longest };
+
+      let run = 1;
+      for (let i = 1; i < days.length; i++) {
+        if (dayDiff(days[i - 1], days[i]) === 1) run++;
+        else run = 1;
+        longest = Math.max(longest, run);
+      }
+      longest = Math.max(longest, 1);
+
+      const today = isoDate(new Date());
+      let cursor = today;
+      while (state.activity[cursor] && Number(state.activity[cursor].hours || 0) > 0) {
+        current += 1;
+        cursor = isoDate(new Date(new Date(cursor).getTime() - 86400000));
+      }
+
+      return { current, longest };
+    }
+
+    function dayDiff(a, b) {
+      const da = new Date(a + 'T00:00:00Z').getTime();
+      const db = new Date(b + 'T00:00:00Z').getTime();
+      return Math.round((db - da) / 86400000);
+    }
+
+    function isoDate(date) {
+      return date.toISOString().slice(0, 10);
+    }
+
+    function skillById(id) { return state.skills.find(s => s.id === id); }
+
+    function pathProgress(path) {
+      const items = state.skills.filter(s => s.path === path);
+      if (!items.length) return 0;
+      const val = items.reduce((sum, s) => sum + statusWeight(s.status), 0) / items.length;
+      return val * 100;
+    }
+
+    function overallProgress() {
+      if (!state.skills.length) return 0;
+      const score = state.skills.reduce((sum, s) => sum + statusWeight(s.status), 0) / state.skills.length;
+      return score * 100;
+    }
+
+    function renderNav() {
+      const nav = document.getElementById('nav');
+      nav.innerHTML = '';
+      SECTIONS.forEach((label, index) => {
+        const btn = document.createElement('button');
+        btn.textContent = label;
+        btn.className = index === 0 ? 'active' : '';
+        btn.onclick = () => {
+          document.querySelectorAll('main section[data-section]').forEach(s => {
+            s.classList.toggle('hidden', s.dataset.section !== label);
+          });
+          nav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        };
+        nav.appendChild(btn);
+      });
+    }
+
+    function renderStorageNotice() {
+      const el = document.getElementById('storageNotice');
+      if (storage.available) {
+        el.classList.add('hidden');
+        return;
+      }
+      el.classList.remove('hidden');
+      el.innerHTML = '<strong class="danger">Local storage unavailable:</strong> data is only kept for this session. Export backups often.';
+    }
+
+    function renderOverview() {
+      const progress = overallProgress();
+      const { current, longest } = getStreaks();
+      const totalHours = getActivityHours();
+      const completed = state.skills.filter(s => s.status === 'Completed').length;
+      const inProgress = state.skills.filter(s => s.status === 'In Progress').length;
+      const weekly = last7DaysHours();
+
+      const section = document.getElementById('overviewSection');
+      section.innerHTML = `
+        <h2>Overview</h2>
+        <div class="grid grid-4">
+          <div class="card"><div class="label">Overall completion</div><div class="metric">${percent(progress)}</div><div class="bar"><span style="width:${progress}%"></span></div></div>
+          <div class="card"><div class="label">Skills completed</div><div class="metric">${completed}/${state.skills.length}</div><div class="muted">In progress: ${inProgress}</div></div>
+          <div class="card"><div class="label">Hours learned</div><div class="metric">${totalHours.toFixed(1)}h</div><div class="muted">Last 7 days: ${weekly.toFixed(1)}h</div></div>
+          <div class="card"><div class="label">Streak</div><div class="metric">${current} days</div><div class="muted">Longest: ${longest} days</div></div>
+        </div>
+        <h3>Career path progress</h3>
+        <div class="grid grid-2">${Object.keys(PATHS).map(path => {
+          const p = pathProgress(path);
+          return `<div class="card"><strong>${path}</strong><div class="muted">${PATHS[path]}</div><div class="bar"><span style="width:${p}%"></span></div><div class="muted">${percent(p)}</div></div>`;
+        }).join('')}</div>
+      `;
+    }
+
+    function renderCareerPaths() {
+      const section = document.getElementById('careerSection');
+      section.innerHTML = `<h2>Career Paths</h2><div class="grid grid-2">${Object.entries(PATHS).map(([path, desc]) => {
+        const list = state.skills.filter(s => s.path === path).sort((a,b)=>a.order-b.order);
+        return `<div class="card"><h3>${path}</h3><p class="muted">${desc}</p>${list.map(s=>`<div class="row"><span class="pill">${s.level}</span><span>${s.name}</span><span class="muted">~${s.estHours}h</span></div>`).join('')}</div>`;
+      }).join('')}</div>`;
+    }
+
+    function renderRoadmap() {
+      const section = document.getElementById('roadmapSection');
+      const pathOptions = ['All', ...Object.keys(PATHS)].map(p => `<option>${p}</option>`).join('');
+      section.innerHTML = `
+        <h2>Roadmap</h2>
+        <div class="row">
+          <div style="min-width:170px"><label for="roadmapPathFilter">Filter by path</label><select id="roadmapPathFilter">${pathOptions}</select></div>
+          <div style="min-width:170px"><label for="roadmapStatusFilter">Filter by status</label><select id="roadmapStatusFilter"><option>All</option>${STATUS_OPTIONS.map(s => `<option>${s}</option>`).join('')}</select></div>
+          <div style="min-width:170px"><label for="roadmapLevelFilter">Filter by level</label><select id="roadmapLevelFilter"><option>All</option><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
+        </div>
+        <div id="roadmapList" class="list" style="margin-top:.8rem"></div>
+      `;
+
+      const redraw = () => {
+        const pathFilter = document.getElementById('roadmapPathFilter').value;
+        const statusFilter = document.getElementById('roadmapStatusFilter').value;
+        const levelFilter = document.getElementById('roadmapLevelFilter').value;
+        const list = document.getElementById('roadmapList');
+
+        const filtered = [...state.skills]
+          .filter(s => pathFilter === 'All' || s.path === pathFilter)
+          .filter(s => statusFilter === 'All' || s.status === statusFilter)
+          .filter(s => levelFilter === 'All' || s.level === levelFilter)
+          .sort((a,b)=>a.path.localeCompare(b.path) || a.order-b.order);
+
+        if (!filtered.length) {
+          list.innerHTML = '<div class="card muted">No roadmap items match the selected filters.</div>';
+          return;
+        }
+
+        list.innerHTML = filtered.map(s => {
+          const depNames = s.deps.map(dep => skillById(dep)?.name || dep).join(', ');
+          const links = s.resources.map(r => `<li><a href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.title)}</a></li>`).join('');
+          return `
+            <details class="card">
+              <summary class="skill-head">
+                <div>
+                  <strong>${escapeHtml(s.name)}</strong>
+                  <div class="muted">${escapeHtml(s.path)} • ${s.level} • ~${s.estHours}h</div>
+                  <div class="pill status-${statusClass(s.status)}">${s.status}</div>
+                </div>
+              </summary>
+              <div style="margin-top:.6rem" class="grid grid-2">
+                <div>
+                  <label>Status</label>
+                  <select data-skill-status="${s.id}">${STATUS_OPTIONS.map(o=>`<option ${o===s.status?'selected':''}>${o}</option>`).join('')}</select>
+                  <div class="muted" style="margin-top:.4rem">Prerequisites: ${depNames || 'None'}</div>
+                </div>
+                <div>
+                  <label>Personal goal</label>
+                  <input value="${escapeHtmlAttr(s.goal || '')}" data-skill-goal="${s.id}" placeholder="e.g. complete in 3 weeks" />
+                </div>
+              </div>
+              <div style="margin-top:.6rem">
+                <label>Notes</label>
+                <textarea data-skill-notes="${s.id}" placeholder="Your notes...">${escapeHtml(s.notes || '')}</textarea>
+              </div>
+              <div style="margin-top:.6rem">
+                <strong>Free resources</strong>
+                <ul>${links || '<li class="muted">No resources yet.</li>'}</ul>
+              </div>
+            </details>
+          `;
+        }).join('');
+
+        list.querySelectorAll('[data-skill-status]').forEach(sel => {
+          sel.onchange = () => {
+            const skill = skillById(sel.dataset.skillStatus);
+            if (!skill) return;
+            skill.status = sel.value;
+            saveState();
+          };
+        });
+
+        list.querySelectorAll('[data-skill-notes]').forEach(input => {
+          input.onchange = () => {
+            const skill = skillById(input.dataset.skillNotes);
+            if (!skill) return;
+            skill.notes = input.value.trim();
+            saveState();
+          };
+        });
+
+        list.querySelectorAll('[data-skill-goal]').forEach(input => {
+          input.onchange = () => {
+            const skill = skillById(input.dataset.skillGoal);
+            if (!skill) return;
+            skill.goal = input.value.trim();
+            saveState();
+          };
+        });
+      };
+
+      ['roadmapPathFilter', 'roadmapStatusFilter', 'roadmapLevelFilter'].forEach(id => {
+        section.querySelector('#'+id).onchange = redraw;
+      });
+
+      redraw();
+    }
+
+    function renderProgress() {
+      const section = document.getElementById('progressSection');
+      const rows = state.skills
+        .sort((a,b)=>a.path.localeCompare(b.path) || a.order-b.order)
+        .map(s => {
+          const val = statusWeight(s.status) * 100;
+          return `<tr>
+            <td>${escapeHtml(s.path)}</td>
+            <td>${escapeHtml(s.name)}</td>
+            <td>${s.level}</td>
+            <td>${s.estHours}h</td>
+            <td><div class="bar"><span style="width:${val}%"></span></div><span class="muted">${percent(val)}</span></td>
+            <td><span class="pill status-${statusClass(s.status)}">${s.status}</span></td>
+          </tr>`;
+        }).join('');
+
+      section.innerHTML = `
+        <h2>My Progress</h2>
+        <div class="card" style="overflow:auto">
+          <table class="table" aria-label="Per skill progress table">
+            <thead><tr><th>Path</th><th>Skill</th><th>Level</th><th>Est. Time</th><th>Progress</th><th>Status</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderResources() {
+      const section = document.getElementById('resourcesSection');
+      const skillOpts = ['<option value="">None</option>', ...state.skills.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`)].join('');
+      const pathOpts = Object.keys(PATHS).map(p => `<option>${p}</option>`).join('');
+      section.innerHTML = `
+        <h2>Resources</h2>
+        <form id="resourceForm" class="card">
+          <input type="hidden" id="resourceId" />
+          <div class="grid grid-3">
+            <div><label>Name</label><input id="resourceName" required /></div>
+            <div><label>URL</label><input id="resourceUrl" type="url" placeholder="https://..." required /></div>
+            <div><label>Category</label><input id="resourceCategory" placeholder="Course, Docs, Practice" required /></div>
+          </div>
+          <div class="grid grid-3" style="margin-top:.6rem">
+            <div><label>Status</label><select id="resourceStatus">${STATUS_OPTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div>
+            <div><label>Career path</label><select id="resourcePath">${pathOpts}</select></div>
+            <div><label>Related skill</label><select id="resourceSkill">${skillOpts}</select></div>
+          </div>
+          <div style="margin-top:.6rem"><label>Notes</label><textarea id="resourceNotes"></textarea></div>
+          <div class="row" style="margin-top:.6rem">
+            <button class="action primary" type="submit">Save Resource</button>
+            <button class="action" id="resourceClear" type="button">Clear</button>
+          </div>
+        </form>
+
+        <div class="row" style="margin-top:.8rem">
+          <div style="min-width:170px"><label>Filter path</label><select id="resourcePathFilter"><option>All</option>${pathOpts}</select></div>
+          <div style="min-width:170px"><label>Filter status</label><select id="resourceStatusFilter"><option>All</option>${STATUS_OPTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div>
+        </div>
+
+        <div id="resourceList" class="list" style="margin-top:.8rem"></div>
+      `;
+
+      const form = section.querySelector('#resourceForm');
+      const clear = () => {
+        form.reset();
+        section.querySelector('#resourceId').value = '';
+      };
+      section.querySelector('#resourceClear').onclick = clear;
+
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const payload = {
+          id: section.querySelector('#resourceId').value || uid(),
+          name: section.querySelector('#resourceName').value.trim(),
+          url: section.querySelector('#resourceUrl').value.trim(),
+          category: section.querySelector('#resourceCategory').value.trim(),
+          status: section.querySelector('#resourceStatus').value,
+          path: section.querySelector('#resourcePath').value,
+          skillId: section.querySelector('#resourceSkill').value,
+          notes: section.querySelector('#resourceNotes').value.trim()
+        };
+        if (!payload.name || !payload.url || !payload.category) return showToast('Please fill required resource fields.');
+        if (!/^https?:\/\//i.test(payload.url)) return showToast('Resource URL must start with http:// or https://');
+
+        const idx = state.resources.findIndex(r => r.id === payload.id);
+        if (idx >= 0) state.resources[idx] = payload;
+        else state.resources.unshift(payload);
+
+        saveState();
+        clear();
+        showToast('Resource saved.');
+      };
+
+      const redraw = () => {
+        const pathFilter = section.querySelector('#resourcePathFilter').value;
+        const statusFilter = section.querySelector('#resourceStatusFilter').value;
+        const list = section.querySelector('#resourceList');
+
+        const items = state.resources
+          .filter(r => pathFilter === 'All' || r.path === pathFilter)
+          .filter(r => statusFilter === 'All' || r.status === statusFilter);
+
+        if (!items.length) {
+          list.innerHTML = '<div class="card muted">No resources yet. Add one above.</div>';
+          return;
+        }
+
+        list.innerHTML = items.map(r => {
+          const skill = skillById(r.skillId)?.name || 'General';
+          return `<div class="card">
+            <div class="skill-head">
+              <div>
+                <strong>${escapeHtml(r.name)}</strong>
+                <div class="muted">${escapeHtml(r.category)} • ${escapeHtml(r.path)} • Skill: ${escapeHtml(skill)}</div>
+              </div>
+              <div class="skill-actions">
+                <button class="action" data-res-edit="${r.id}">Edit</button>
+                <button class="action" data-res-toggle="${r.id}">${r.status === 'Completed' ? 'Mark In Progress' : 'Mark Completed'}</button>
+                <button class="action" data-res-del="${r.id}">Delete</button>
+              </div>
+            </div>
+            <div class="muted" style="margin-top:.4rem">${escapeHtml(r.notes || 'No notes')}</div>
+            <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">Open resource ↗</a>
+            <div class="pill status-${statusClass(r.status)}">${r.status}</div>
+          </div>`;
+        }).join('');
+
+        list.querySelectorAll('[data-res-edit]').forEach(btn => btn.onclick = () => {
+          const r = state.resources.find(x => x.id === btn.dataset.resEdit);
+          if (!r) return;
+          section.querySelector('#resourceId').value = r.id;
+          section.querySelector('#resourceName').value = r.name;
+          section.querySelector('#resourceUrl').value = r.url;
+          section.querySelector('#resourceCategory').value = r.category;
+          section.querySelector('#resourceStatus').value = r.status;
+          section.querySelector('#resourcePath').value = r.path;
+          section.querySelector('#resourceSkill').value = r.skillId || '';
+          section.querySelector('#resourceNotes').value = r.notes || '';
+          showToast('Loaded resource for editing.');
+        });
+
+        list.querySelectorAll('[data-res-toggle]').forEach(btn => btn.onclick = () => {
+          const r = state.resources.find(x => x.id === btn.dataset.resToggle);
+          if (!r) return;
+          r.status = r.status === 'Completed' ? 'In Progress' : 'Completed';
+          saveState();
+        });
+
+        list.querySelectorAll('[data-res-del]').forEach(btn => btn.onclick = () => {
+          if (!confirm('Delete this resource?')) return;
+          state.resources = state.resources.filter(x => x.id !== btn.dataset.resDel);
+          saveState();
+        });
+      };
+
+      section.querySelector('#resourcePathFilter').onchange = redraw;
+      section.querySelector('#resourceStatusFilter').onchange = redraw;
+      redraw();
+    }
+
+    function renderSkills() {
+      const section = document.getElementById('skillsSection');
+      const pathOpts = Object.keys(PATHS).map(p => `<option>${p}</option>`).join('');
+      const idToName = Object.fromEntries(state.skills.map(s => [s.id, s.name]));
+      section.innerHTML = `
+        <h2>Skills</h2>
+        <form id="skillForm" class="card">
+          <input type="hidden" id="skillId" />
+          <div class="grid grid-3">
+            <div><label>Skill name</label><input id="skillName" required /></div>
+            <div><label>Career path</label><select id="skillPath">${pathOpts}</select></div>
+            <div><label>Level</label><select id="skillLevel"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
+          </div>
+          <div class="grid grid-3" style="margin-top:.6rem">
+            <div><label>Estimated hours</label><input id="skillHours" type="number" min="1" value="10" /></div>
+            <div><label>Status</label><select id="skillStatus">${STATUS_OPTIONS.map(s=>`<option>${s}</option>`).join('')}</select></div>
+            <div><label>Goal</label><input id="skillGoal" /></div>
+          </div>
+          <div style="margin-top:.6rem"><label>Notes</label><textarea id="skillNotes"></textarea></div>
+          <div class="row" style="margin-top:.6rem">
+            <button class="action primary" type="submit">Save Skill</button>
+            <button class="action" id="skillClear" type="button">Clear</button>
+          </div>
+        </form>
+
+        <div id="skillList" class="list" style="margin-top:.8rem"></div>
+      `;
+
+      const form = section.querySelector('#skillForm');
+      const clear = () => { form.reset(); section.querySelector('#skillId').value = ''; section.querySelector('#skillHours').value = '10'; };
+      section.querySelector('#skillClear').onclick = clear;
+
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const id = section.querySelector('#skillId').value || uid();
+        const payload = {
+          id,
+          name: section.querySelector('#skillName').value.trim(),
+          path: section.querySelector('#skillPath').value,
+          level: section.querySelector('#skillLevel').value,
+          estHours: Math.max(1, Number(section.querySelector('#skillHours').value || 1)),
+          status: section.querySelector('#skillStatus').value,
+          goal: section.querySelector('#skillGoal').value.trim(),
+          notes: section.querySelector('#skillNotes').value.trim(),
+          deps: [],
+          resources: [],
+          order: 999,
+          isCustom: true
+        };
+        if (!payload.name) return showToast('Skill name is required.');
+        const idx = state.skills.findIndex(s => s.id === id);
+        if (idx >= 0) state.skills[idx] = { ...state.skills[idx], ...payload, isCustom: state.skills[idx].isCustom || !!section.querySelector('#skillId').value };
+        else state.skills.push(payload);
+        saveState();
+        clear();
+      };
+
+      const list = section.querySelector('#skillList');
+      list.innerHTML = state.skills
+        .sort((a,b)=>a.path.localeCompare(b.path) || a.order-b.order || a.name.localeCompare(b.name))
+        .map(s => `<div class="card">
+          <div class="skill-head">
+            <div>
+              <strong>${escapeHtml(s.name)}</strong>
+              <div class="muted">${s.path} • ${s.level} • ~${s.estHours}h</div>
+              <div class="muted">Dependencies: ${(s.deps || []).map(d => idToName[d] || d).join(', ') || 'None'}</div>
+            </div>
+            <div class="skill-actions">
+              <button class="action" data-skill-edit="${s.id}">Edit</button>
+              ${s.isCustom ? `<button class="action" data-skill-del="${s.id}">Delete</button>` : ''}
+            </div>
+          </div>
+          <div class="pill status-${statusClass(s.status)}">${s.status}</div>
+          <div class="muted">Goal: ${escapeHtml(s.goal || '—')}</div>
+        </div>`).join('');
+
+      list.querySelectorAll('[data-skill-edit]').forEach(btn => btn.onclick = () => {
+        const s = skillById(btn.dataset.skillEdit);
+        if (!s) return;
+        section.querySelector('#skillId').value = s.id;
+        section.querySelector('#skillName').value = s.name;
+        section.querySelector('#skillPath').value = s.path;
+        section.querySelector('#skillLevel').value = s.level;
+        section.querySelector('#skillHours').value = s.estHours;
+        section.querySelector('#skillStatus').value = s.status;
+        section.querySelector('#skillGoal').value = s.goal || '';
+        section.querySelector('#skillNotes').value = s.notes || '';
+      });
+
+      list.querySelectorAll('[data-skill-del]').forEach(btn => btn.onclick = () => {
+        if (!confirm('Delete this custom skill?')) return;
+        state.skills = state.skills.filter(s => s.id !== btn.dataset.skillDel);
+        state.resources = state.resources.map(r => r.skillId === btn.dataset.skillDel ? { ...r, skillId: '' } : r);
+        saveState();
+      });
+    }
+
+    function renderActivity() {
+      const section = document.getElementById('activitySection');
+      const today = isoDate(new Date());
+      section.innerHTML = `
+        <h2>Streak & Activity</h2>
+        <form id="activityForm" class="card">
+          <div class="grid grid-3">
+            <div><label>Date</label><input id="activityDate" type="date" value="${today}" required /></div>
+            <div><label>Hours</label><input id="activityHours" type="number" step="0.25" min="0" value="1" required /></div>
+            <div><label>Topic</label><input id="activityTopic" placeholder="e.g. SQL joins" /></div>
+          </div>
+          <div style="margin-top:.6rem"><label>Notes</label><input id="activityNote" placeholder="What did you learn today?" /></div>
+          <div class="row" style="margin-top:.6rem">
+            <button class="action primary" type="submit">Log Activity</button>
+            <button class="action" id="activityDelete" type="button">Delete Day Entry</button>
+          </div>
+        </form>
+
+        <div class="card" style="margin-top:.8rem">
+          <strong>Contribution Heatmap (last 20 weeks)</strong>
+          <div id="heatmap" class="heatmap" style="margin-top:.6rem"></div>
+          <div class="muted">Shade intensity increases with hours logged.</div>
+        </div>
+
+        <div id="activityRecent" class="list" style="margin-top:.8rem"></div>
+      `;
+
+      const form = section.querySelector('#activityForm');
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const date = section.querySelector('#activityDate').value;
+        const hours = Number(section.querySelector('#activityHours').value || 0);
+        if (!date) return showToast('Date is required.');
+        if (hours < 0) return showToast('Hours cannot be negative.');
+        const topic = section.querySelector('#activityTopic').value.trim();
+        const note = section.querySelector('#activityNote').value.trim();
+        state.activity[date] = { hours, topic, note };
+        saveState();
+      };
+
+      section.querySelector('#activityDelete').onclick = () => {
+        const date = section.querySelector('#activityDate').value;
+        if (!date || !state.activity[date]) return showToast('No entry for selected date.');
+        delete state.activity[date];
+        saveState();
+      };
+
+      renderHeatmap(section.querySelector('#heatmap'));
+      renderRecentActivity(section.querySelector('#activityRecent'));
+    }
+
+    function renderHeatmap(el) {
+      const days = 140;
+      const start = new Date();
+      start.setDate(start.getDate() - (days - 1));
+      el.innerHTML = '';
+      for (let i = 0; i < days; i++) {
+        const date = new Date(start);
+        date.setDate(start.getDate() + i);
+        const key = isoDate(date);
+        const hours = Number(state.activity[key]?.hours || 0);
+        const lvl = hours === 0 ? 0 : hours < 1 ? 1 : hours < 2 ? 2 : hours < 4 ? 3 : 4;
+        const cell = document.createElement('div');
+        cell.className = `cell ${lvl ? 'lvl' + lvl : ''}`;
+        cell.title = `${key}: ${hours}h`;
+        el.appendChild(cell);
+      }
+    }
+
+    function renderRecentActivity(el) {
+      const entries = Object.entries(state.activity)
+        .sort((a,b)=>b[0].localeCompare(a[0]))
+        .slice(0, 14);
+      if (!entries.length) {
+        el.innerHTML = '<div class="card muted">No activity logged yet. Add your first day above.</div>';
+        return;
+      }
+      el.innerHTML = `<div class="card"><strong>Recent activity</strong>
+        <table class="table"><thead><tr><th>Date</th><th>Hours</th><th>Topic</th><th>Notes</th></tr></thead>
+        <tbody>${entries.map(([date,v]) => `<tr><td>${date}</td><td>${Number(v.hours||0)}</td><td>${escapeHtml(v.topic||'—')}</td><td>${escapeHtml(v.note||'—')}</td></tr>`).join('')}</tbody>
+      </table></div>`;
+    }
+
+    function renderNotes() {
+      const section = document.getElementById('notesSection');
+      section.innerHTML = `
+        <h2>Notes & Goals</h2>
+        <div class="grid grid-2">
+          <div class="card">
+            <label>Long-form notes</label>
+            <textarea id="globalNotes" placeholder="Weekly reflection, blockers, key takeaways...">${escapeHtml(state.notes)}</textarea>
+          </div>
+          <div class="card">
+            <label>Main goals</label>
+            <textarea id="globalGoals" placeholder="e.g. Become interview-ready for Data Analyst in 4 months">${escapeHtml(state.goals)}</textarea>
+          </div>
+        </div>
+        <div class="row" style="margin-top:.8rem">
+          <button class="action primary" id="saveNotes">Save Notes/Goals</button>
+          <button class="action" id="exportBtn">Export JSON</button>
+          <label class="action" style="display:inline-flex;align-items:center;gap:.35rem;cursor:pointer;">Import JSON<input id="importFile" type="file" accept="application/json" style="display:none"></label>
+          <button class="action" id="resetBtn">Reset to Demo Data</button>
+        </div>
+      `;
+
+      section.querySelector('#saveNotes').onclick = () => {
+        state.notes = section.querySelector('#globalNotes').value;
+        state.goals = section.querySelector('#globalGoals').value;
+        saveState();
+        showToast('Saved notes and goals.');
+      };
+
+      section.querySelector('#exportBtn').onclick = () => {
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data-career-dashboard-backup.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      section.querySelector('#importFile').onchange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const imported = JSON.parse(String(reader.result || '{}'));
+            state = mergeState(imported);
+            saveState();
+            showToast('Import successful.');
+          } catch {
+            showToast('Invalid JSON import file.');
+          }
+        };
+        reader.readAsText(file);
+      };
+
+      section.querySelector('#resetBtn').onclick = () => {
+        if (!confirm('Reset all local data to demo defaults?')) return;
+        state = defaultState();
+        saveState();
+      };
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function escapeHtmlAttr(str) {
+      return escapeHtml(str).replaceAll('`', '&#96;');
+    }
+
+    function statusClass(status) {
+      return status.toLowerCase().replaceAll(' ', '-');
+    }
+
+    function last7DaysHours() {
+      let total = 0;
+      const now = new Date();
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(now);
+        d.setDate(now.getDate() - i);
+        total += Number(state.activity[isoDate(d)]?.hours || 0);
+      }
+      return total;
+    }
+
+    function renderAll() {
+      renderStorageNotice();
+      renderOverview();
+      renderCareerPaths();
+      renderRoadmap();
+      renderProgress();
+      renderResources();
+      renderSkills();
+      renderActivity();
+      renderNotes();
+    }
+
+    renderNav();
+    renderAll();
+  </script>
+</body>
+</html>
